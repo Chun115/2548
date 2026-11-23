@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>鐘面大冒險</title>
-<meta name="description" content="國小二年級「認識鐘面」練習遊戲：看鐘說幾時、撥一撥時針、分辨時針分針與大格小格，答對有獎勵音效，手機平板打開就能玩。">
+<meta name="description" content="二上單元八練習遊戲：認識鐘面、幾時幾分、沒有數字的鐘面、經過多久。答對有獎勵音效，手機平板打開就能玩。">
 <meta property="og:type" content="website">
-<meta property="og:title" content="鐘面大冒險｜認識鐘面、幾時練習">
-<meta property="og:description" content="國小二年級「認識鐘面」練習遊戲：看鐘說幾時、撥一撥時針、分辨時針分針與大格小格，答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:title" content="鐘面大冒險｜二上單元八 時間">
+<meta property="og:description" content="二上單元八練習遊戲：認識鐘面、幾時幾分、沒有數字的鐘面、經過多久。答對有獎勵音效，手機平板打開就能玩。">
 <meta property="og:image" content="https://chun115.github.io/2548/og-clock.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -63,12 +63,14 @@ svg.clock.set{cursor:pointer}
 .hidden{display:none}
 .fx{position:fixed;pointer-events:none;font-size:28px;animation:fly 1s forwards}
 @keyframes fly{to{transform:translateY(-120px) scale(1.4);opacity:0}}
+.backhome{display:inline-block;margin:0 0 6px;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid rgba(0,0,0,.08);color:#2b2340;font-weight:700;font-size:14px;text-decoration:none}
 </style>
 </head>
 <body>
 <div class="wrap">
+  <a class="backhome" href="./">← 遊戲目錄</a>
   <h1>🕐 鐘面大冒險</h1>
-  <p class="sub">認識鐘面：幾時、時針分針、大格小格</p>
+  <p class="sub">二上・單元八：認識鐘面、報讀時刻、經過的時間</p>
 
   <div id="home" class="card">
     <div class="label">選擇遊戲</div>
@@ -77,7 +79,10 @@ svg.clock.set{cursor:pointer}
       <button class="mode" data-mode="read"><span class="ic">👀</span><div><b>看鐘說幾時</b><span>10 題，看時鐘選出正確的時間</span></div></button>
       <button class="mode" data-mode="set"><span class="ic">👆</span><div><b>撥一撥</b><span>把短針撥到正確的位置</span></div></button>
       <button class="mode" data-mode="quiz"><span class="ic">🔍</span><div><b>鐘面小偵探</b><span>時針還是分針？大格還是小格？</span></div></button>
-      <button class="mode" data-mode="speed"><span class="ic">⚡</span><div><b>60 秒快閃</b><span>一分鐘內能看懂幾個時鐘？</span></div></button>
+      <button class="mode" data-mode="hm"><span class="ic">⏱️</span><div><b>幾時幾分</b><span>看長針和短針，報讀時刻</span></div></button>
+      <button class="mode" data-mode="blank"><span class="ic">🫥</span><div><b>沒有數字的鐘面</b><span>鐘面上沒有數字，你還看得懂嗎？</span></div></button>
+      <button class="mode" data-mode="elapsed"><span class="ic">⏳</span><div><b>經過多久？</b><span>從幾時到幾時，經過幾小時、幾分鐘</span></div></button>
+      <button class="mode" data-mode="speed"><span class="ic">⚡</span><div><b>60 秒快閃</b><span>所有題型混在一起，一分鐘能答對幾題？</span></div></button>
     </div>
     <div class="best" id="best"></div>
   </div>
@@ -131,15 +136,15 @@ function clockSVG(o){
     const big=i%5===0, p1=pt(i*6,big?84:89), p2=pt(i*6,95);
     s+=`<line x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}" stroke="#555" stroke-width="${big?2.6:1.2}"/>`;
   }
-  for(let n=1;n<=12;n++){const p=pt(n*30,70);s+=`<text x="${p[0]}" y="${p[1]}" text-anchor="middle" dominant-baseline="central" font-size="19" font-weight="900" fill="#2b2340" font-family="Noto Sans TC, sans-serif">${n}</text>`;}
+  if(o.nums!==false)for(let n=1;n<=12;n++){const p=pt(n*30,70);s+=`<text x="${p[0]}" y="${p[1]}" text-anchor="middle" dominant-baseline="central" font-size="19" font-weight="900" fill="#2b2340" font-family="Noto Sans TC, sans-serif">${n}</text>`;}
   const glow=c=>`stroke="var(--hl)" stroke-width="${c}" stroke-linecap="round"`;
   if(o.hour!=null){
-    const ha=(o.hour%12)*30, hp=pt(ha,46);
+    const ha=(o.hour%12)*30+(o.min||0)*0.5, hp=pt(ha,46);
     if(o.hl==='hour')s+=`<line x1="0" y1="0" x2="${hp[0]}" y2="${hp[1]}" ${glow(18)}/>`;
     s+=`<line id="hHand" x1="0" y1="0" x2="${hp[0]}" y2="${hp[1]}" stroke="var(--hour)" stroke-width="8" stroke-linecap="round"/>`;
   }
   if(o.showMin!==false){
-    const mp=pt(0,80);
+    const mp=pt((o.min||0)*6,80);
     if(o.hl==='minute')s+=`<line x1="0" y1="0" x2="${mp[0]}" y2="${mp[1]}" ${glow(14)}/>`;
     s+=`<line x1="0" y1="0" x2="${mp[0]}" y2="${mp[1]}" stroke="var(--min)" stroke-width="4.5" stroke-linecap="round"/>`;
   }
@@ -227,6 +232,44 @@ const shuffle=a=>a.sort(()=>Math.random()-.5);
 let lastH=0;
 function randHour(){let h;do{h=1+rnd(12);}while(h===lastH);lastH=h;return h;}
 
+
+function hmText(h,m){return m===0?`${h} 時`:`${h} 時 ${m} 分`;}
+function hmOpts(h,m){
+  const s=new Map();const add=(hh,mm)=>{hh=(hh+11)%12+1;if(mm<0||mm>59)return;const t=hmText(hh,mm);if(!s.has(t))s.set(t,t);};
+  add(h,m);
+  if(m%5===0&&m>0)add(h,m/5);          // 把長針指的數字當成分
+  if(m>=30)add(h+1,m);                  // 短針快到下一個數字，看成下一時
+  add(h,(m+5)%60);add(h-1,m);add(h,Math.abs(m-5));add(h,(m+10)%60);
+  return shuffle([...s.keys()].slice(0,4)).map(t=>({v:t,t}));
+}
+function makeHM(nums){
+  const h=1+rnd(12);const m=Math.random()<.75?5*(1+rnd(11)):1+rnd(59);
+  const t=hmText(h,m);
+  return {kind:'choice',prompt:nums===false?'沒有數字的鐘面，現在是幾時幾分？':'現在是幾時幾分？',clock:{hour:h,min:m,nums},ans:t,opts:hmOpts(h,m),
+    say:'',sayAns:'',miss:`短針在 ${h} 和 ${h%12+1} 之間 → ${h} 時；長針走了 ${m} 小格 → ${m} 分，是 ${t}`};
+}
+function makeBlank(){
+  if(Math.random()<.5){const q=makeRead();q.clock.nums=false;q.prompt='沒有數字的鐘面，這是幾時？';return q;}
+  return makeHM(false);
+}
+function twoClocks(h1,m1,h2,m2){
+  const one=(h,m,l)=>`<div style="text-align:center;font-weight:900">${clockSVG({hour:h,min:m}).replace('class="clock "','class="clock" style="width:min(40vw,160px)"')}<div>${l}</div></div>`;
+  return `<div style="display:flex;gap:14px;align-items:center">${one(h1,m1,'開始')}<div style="font-size:30px">➡️</div>${one(h2,m2,'結束')}</div>`;
+}
+function makeElapsed(){
+  if(Math.random()<.5){ // 經過幾小時
+    const h1=1+rnd(9),d=1+rnd(Math.min(5,12-h1));const h2=h1+d;
+    return {kind:'choice',prompt:`從 ${h1} 時到 ${h2} 時，經過幾小時？`,html:twoClocks(h1,0,h2,0),ans:d,
+      opts:shuffle([...new Set([d,d+1,Math.max(1,d-1)===d?d+2:d-1,h2])].slice(0,4)).map(v=>({v,t:v+' 小時'})),say:'',sayAns:'',miss:`短針從 ${h1} 走到 ${h2}，走了 ${d} 大格，經過 ${d} 小時`};
+  }
+  const h=1+rnd(11);const m1=5*rnd(8),d=5*(1+rnd(Math.min(6,(55-m1)/5)));const m2=m1+d;
+  const wr=[d,d/5,m2,d+5,Math.abs(d-5)||d+10];
+  return {kind:'choice',prompt:`從 ${hmText(h,m1)} 到 ${hmText(h,m2)}，<br>經過幾分鐘？`,html:twoClocks(h,m1,h,m2),ans:d,
+    opts:shuffle((()=>{const t=new Set(wr);let k=10;while(t.size<4){t.add(d+k);k+=5;}return [...t].slice(0,4);})()).map(v=>({v,t:v+' 分鐘'})),say:'',sayAns:'',miss:`長針從 ${m1/5===0?12:m1/5} 走到 ${m2/5}，走了 ${d} 小格，經過 ${d} 分鐘`};
+}
+function makeAny(){return pick([makeRead,makeHM,makeHM,makeQuiz,makeBlank,makeElapsed])();}
+function pick(a){return a[rnd(a.length)];}
+
 function makeRead(){
   const h=randHour();
   const s=new Set([h]);
@@ -280,7 +323,7 @@ function makeQuiz(){
 
 function next(){
   locked=false;
-  cur= mode==='set'?makeSet(): mode==='quiz'?makeQuiz(): makeRead();
+  cur= mode==='set'?makeSet(): mode==='quiz'?makeQuiz(): mode==='hm'?makeHM(): mode==='blank'?makeBlank(): mode==='elapsed'?makeElapsed(): mode==='speed'?makeAny(): makeRead();
   updateHud();
   $('prompt').innerHTML=cur.prompt;$('hint').textContent='';
   const box=$('clockbox'),o=$('opts');o.innerHTML='';
@@ -292,7 +335,7 @@ function next(){
     $('hint').textContent='點一下鐘面上的數字（也可以拖拉），放上短針';
     bindSet(box.querySelector('svg'));
   }else{
-    box.innerHTML=cur.clock?clockSVG(cur.clock):'';
+    box.innerHTML=cur.html||(cur.clock?clockSVG(cur.clock):'');
     cur.opts.forEach(x=>{const b=document.createElement('button');b.className='opt';b.textContent=x.t;b.dataset.v=x.v;b.onclick=()=>answer(b,x.v);o.appendChild(b);});
   }
   speak(cur.say);
