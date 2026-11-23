@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>認識公分</title>
+<meta name="description" content="二上單元三練習遊戲：用尺量一量、不從 0 開始量、長度的加減、個別單位。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="認識公分｜二上單元三練習遊戲">
+<meta property="og:description" content="用尺量一量、不從 0 開始量、長度的加減、個別單位。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:image" content="https://chun115.github.io/2548/og-cm.png">
+<meta property="og:url" content="https://chun115.github.io/2548/cm.html">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<script>
+const ITEMS=[['#ffd43b','#e0a800','鉛筆'],['#ff8787','#e03131','緞帶'],['#74c0fc','#1c7ed6','紙條'],['#8ce99a','#2f9e44','吸管']];
+function ruler(s,e,item){
+  const U=28,L=15,X0=20,W=X0*2+L*U;
+  let g=`<rect x="${X0-12}" y="60" width="${L*U+24}" height="56" rx="6" fill="#fff3bf" stroke="#d9a400" stroke-width="2"/>`;
+  for(let i=0;i<=L;i++){const x=X0+i*U;g+=`<line x1="${x}" y1="60" x2="${x}" y2="${i%5===0?84:78}" stroke="#333" stroke-width="2"/><text x="${x}" y="102" text-anchor="middle" font-size="15" font-weight="700" font-family="Noto Sans TC">${i}</text>`;
+    if(i<L)g+=`<line x1="${x+U/2}" y1="60" x2="${x+U/2}" y2="70" stroke="#666" stroke-width="1"/>`;}
+  const [f,st]=item;const x1=X0+s*U,x2=X0+e*U;
+  g+=`<rect x="${x1}" y="22" width="${x2-x1}" height="26" rx="5" fill="${f}" stroke="${st}" stroke-width="2.5"/>`;
+  g+=`<line x1="${x1}" y1="48" x2="${x1}" y2="60" stroke="${st}" stroke-dasharray="3 3" stroke-width="2"/><line x1="${x2}" y1="48" x2="${x2}" y2="60" stroke="${st}" stroke-dasharray="3 3" stroke-width="2"/>`;
+  return `<svg viewBox="0 0 ${W} 120" style="width:min(92vw,500px);height:auto">${g}</svg>`;
+}
+function unitPic(icon,n){return `<span style="font-size:26px;letter-spacing:2px">${icon.repeat(n)}</span>`;}
+
+window.GAME={
+  title:'認識公分',emoji:'📏',sub:'二上・單元三：量一量、長度加減、個別單位',color:'#e8590c',bg:'#fff8ec',line:'#f5e1c8',
+  modes:[
+    {id:'measure',icon:'📏',name:'從 0 開始量',desc:'看尺說出有幾公分'},
+    {id:'shift',icon:'🔍',name:'不從 0 開始量',desc:'小心！要數有幾格'},
+    {id:'calc',icon:'✂️',name:'長度的加減',desc:'接起來、剪掉、比長短'},
+    {id:'unit',icon:'🧷',name:'個別單位',desc:'用不同東西量，結果會一樣嗎？'},
+  ],
+  speedStars:[6,10,14],
+  make(m){
+    if(m==='measure'||m==='shift'){
+      const it=pick(ITEMS);const len=RI(2,m==='measure'?15:11);const s=m==='measure'?0:RI(1,15-len);const e=s+len;
+      return {prompt:`這條${it[2]}長幾公分？`,visual:ruler(s,e,it),ans:len,opts:numOpts(len,[e,len+1,len-1].filter(x=>x>0),' 公分',1),
+        miss:s?`從 ${s} 到 ${e}，數一數有 ${len} 格，是 <b>${len} 公分</b>（不是 ${e} 公分）`:`從 0 量到 ${e}，是 <b>${len} 公分</b>`};
+    }
+    if(m==='calc'){
+      const k=R(4);let a,b;
+      if(k===0){a=RI(5,30);b=RI(5,30);return {prompt:`紅紙條長 ${a} 公分，藍紙條長 ${b} 公分，<br>接成一條（不重疊）共長幾公分？`,ans:a+b,opts:numOpts(a+b,[Math.abs(a-b)],' 公分',1),miss:`${a} + ${b} = <b>${a+b} 公分</b>`};}
+      if(k===1){a=RI(20,60);b=RI(5,a-5);return {prompt:`一條緞帶長 ${a} 公分，<br>剪掉 ${b} 公分，還剩幾公分？`,ans:a-b,opts:numOpts(a-b,[a+b],' 公分',1),miss:`${a} − ${b} = <b>${a-b} 公分</b>`};}
+      if(k===2){a=RI(12,20);b=RI(3,a-3);return {prompt:`鉛筆長 ${a} 公分，橡皮擦長 ${b} 公分，<br>鉛筆比橡皮擦長幾公分？`,ans:a-b,opts:numOpts(a-b,[a+b],' 公分',1),miss:`${a} − ${b} = <b>${a-b} 公分</b>`};}
+      a=RI(10,40);b=RI(3,15);return {prompt:`小華的書包帶子長 ${a} 公分，<br>再放長 ${b} 公分，變成幾公分？`,ans:a+b,opts:numOpts(a+b,[a-b],' 公分',1),miss:`${a} + ${b} = <b>${a+b} 公分</b>`};
+    }
+    // unit：個別單位
+    const k=R(3);
+    const U=[['🧷','迴紋針'],['🖍️','蠟筆'],['🧱','積木']];
+    if(k===0){ // 同一物體，不同單位
+      const [u1,u2]=shuffle([...U]).slice(0,2);const n1=RI(5,9),n2=RI(2,n1-2);
+      return {prompt:`同一張桌子，用${u1[1]}量是 ${n1} 個，<br>用${u2[1]}量是 ${n2} 個。<br>哪一個比較長？`,ans:u2[1],
+        opts:shuffle([{v:u1[1],t:u1[1]},{v:u2[1],t:u2[1]},{v:'一樣長',t:'一樣長'}]),
+        miss:`量同一個東西，用的東西越長，量出來的數量越少，所以 <b>${u2[1]}</b> 比較長`};
+    }
+    if(k===1){ // 同單位比長短
+      const u=pick(U);const a=RI(3,9);let b=RI(3,9);if(b===a)b=a+1;
+      return {prompt:`用${u[1]}量：<br>甲繩子 ${a} 個，乙繩子 ${b} 個。<br>哪一條比較長？`,visual:`<div style="text-align:left;line-height:2">甲 ${unitPic(u[0],a)}<br>乙 ${unitPic(u[0],b)}</div>`,
+        ans:a>b?'甲':'乙',opts:[{v:'甲',t:'甲'},{v:'乙',t:'乙'},{v:'一樣長',t:'一樣長'}],miss:`用一樣的東西量，數量多的比較長，<b>${a>b?'甲':'乙'}</b> 比較長`};
+    }
+    const a=RI(3,6);
+    return {prompt:`甲繩子用 🧷 迴紋針量是 ${a} 個，<br>乙繩子用 🖍️ 蠟筆量也是 ${a} 個。<br>（蠟筆比迴紋針長）哪一條比較長？`,ans:'乙',
+      opts:[{v:'甲',t:'甲'},{v:'乙',t:'乙'},{v:'一樣長',t:'一樣長'}],miss:`數量一樣，但蠟筆比迴紋針長，所以 <b>乙</b> 比較長。數量一樣不一定一樣長！`};
+  }
+};
+</script>
+<script src="engine.js"></script>
+</body>
+</html>

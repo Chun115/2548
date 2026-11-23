@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>二位數的加減法</title>
+<meta name="description" content="二上單元二練習遊戲：二位數直式加法、減法（含進位、退位）、等於大於小於。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="二位數的加減法｜二上單元二練習遊戲">
+<meta property="og:description" content="二位數直式加法、減法（含進位、退位）、等於大於小於。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:image" content="https://chun115.github.io/2548/og-addsub.png">
+<meta property="og:url" content="https://chun115.github.io/2548/addsub.html">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<script>
+/* 加法：最多一次進位 */
+function genAdd(carry){
+  for(;;){const a=RI(10,99),b=RI(10,99);const o=a%10+b%10>=10,t=Math.floor(a/10)+Math.floor(b/10)+(o?1:0)>=10;
+    if(o&&t)continue;if(carry===true&&!o)continue;if(carry===false&&o)continue;return [a,b];}
+}
+function genSub(borrow){
+  for(;;){const a=RI(20,99);const b=RI(10,a-1);
+    const bo=a%10<b%10;
+    if(borrow===true&&!bo)continue;if(borrow===false&&bo)continue;if(a-b<1)continue;return [a,b];}
+}
+function addQ(){
+  const [a,b]=genAdd(Math.random()<.65);const c=a+b;
+  const noCarry=Math.floor(c/10)*10-10+c%10; // 忘了進位
+  const wr=[noCarry,c+10,c-1,c+1].filter(x=>x!==c&&x>0);
+  return {prompt:'算算看，答案是多少？',visual:vertical(a,'+',b,null),ans:c,opts:numOpts(c,wr),
+    after:vertical(a,'+',b,c),miss:`${a} + ${b} = <b>${c}</b>${(a%10+b%10>=10)?'（個位滿十要進 1 到十位）':''}`};
+}
+function subQ(){
+  const [a,b]=genSub(Math.random()<.65);const c=a-b;
+  const ao=a%10,bo=b%10,at=Math.floor(a/10),bt=Math.floor(b/10);
+  const w1=(at-bt)*10+Math.abs(ao-bo); // 大減小
+  const w2=(at-bt)*10+(ao<bo?ao+10-bo:ao-bo); // 忘了退位後十位要減 1
+  const wr=[w1,w2,c+10,c-10].filter(x=>x!==c&&x>0);
+  return {prompt:'算算看，答案是多少？',visual:vertical(a,'−',b,null),ans:c,opts:numOpts(c,wr),
+    after:vertical(a,'−',b,c),miss:`${a} − ${b} = <b>${c}</b>${ao<bo?'（個位不夠減，向十位借 1 個十）':''}`};
+}
+function expr(){const k=R(2);if(k===0){const [a,b]=genAdd(R(2)===0);return {t:`${a} + ${b}`,v:a+b};}const [a,b]=genSub(R(2)===0);return {t:`${a} − ${b}`,v:a-b};}
+
+window.GAME={
+  title:'二位數的加減法',emoji:'➕',sub:'二上・單元二：直式加法、減法、＝＞＜',color:'#1c7ed6',bg:'#eef6ff',line:'#d0e4f7',
+  modes:[
+    {id:'add',icon:'➕',name:'直式加法',desc:'二位數加法，有時候要進位'},
+    {id:'sub',icon:'➖',name:'直式減法',desc:'二位數減法，有時候要退位'},
+    {id:'cmp',icon:'⚖️',name:'等於、大於、小於',desc:'先算一算，再選 ＞、＜ 或 ＝'},
+    {id:'story',icon:'📖',name:'生活應用題',desc:'讀題目，算出答案'},
+  ],
+  speedStars:[5,8,12],
+  make(m){
+    if(m==='add')return addQ();
+    if(m==='sub')return subQ();
+    if(m==='cmp'){
+      const L=expr();let r;
+      if(Math.random()<.5){let d=pick([0,0,1,-1,10,-10]);if(L.v+d<1)d=pick([0,1,10]);r={t:String(L.v+d),v:L.v+d};}
+      else{r=expr();if(Math.random()<.35){ // 刻意做成相等
+        const b=RI(10,Math.min(60,L.v));const a=L.v+b;if(a<200)r={t:`${a} − ${b}`,v:L.v};}}
+      const ans=L.v>r.v?'>':L.v<r.v?'<':'=';const sym={'>':'＞','<':'＜','=':'＝'}[ans];
+      return {prompt:`<span style="font-size:32px">${L.t} ○ ${r.t}</span>`,ans,opts:[{v:'>',t:'＞'},{v:'<',t:'＜'},{v:'=',t:'＝'}],
+        miss:`${L.t} = ${L.v}，${r.t}${r.t.match(/[+−]/)?` = ${r.v}`:''}，所以 ${L.t} ${sym} ${r.t}`};
+    }
+    const k=R(4);
+    if(k===0){const [a,b]=genAdd(true);return {prompt:`圖書角有 ${a} 本故事書，<br>又放進 ${b} 本，現在有幾本？`,ans:a+b,opts:numOpts(a+b,[a-b>0?a-b:a+b+10,a+b-10],' 本'),miss:`${a} + ${b} = <b>${a+b}</b> 本`};}
+    if(k===1){const [a,b]=genSub(true);return {prompt:`媽媽買了 ${a} 顆雞蛋，<br>用掉 ${b} 顆，還剩幾顆？`,ans:a-b,opts:numOpts(a-b,[a+b,a-b+10],' 顆'),miss:`${a} − ${b} = <b>${a-b}</b> 顆`};}
+    if(k===2){const [a,b]=genSub(Math.random()<.6);return {prompt:`哥哥有 ${a} 張貼紙，弟弟有 ${b} 張，<br>哥哥比弟弟多幾張？`,ans:a-b,opts:numOpts(a-b,[a+b,a-b+10],' 張'),miss:`${a} − ${b} = <b>${a-b}</b> 張`};}
+    const [a,b]=genAdd(Math.random()<.6);return {prompt:`一盒鉛筆 ${a} 元，一個橡皮擦 ${b} 元，<br>一共要付幾元？`,ans:a+b,opts:numOpts(a+b,[Math.abs(a-b),a+b-10],' 元'),miss:`${a} + ${b} = <b>${a+b}</b> 元`};
+  }
+};
+</script>
+<script src="engine.js"></script>
+</body>
+</html>

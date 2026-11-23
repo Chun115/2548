@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>加減兩步驟</title>
+<meta name="description" content="二上單元六練習遊戲：三個數連加、連減、加減混合與兩步驟應用題。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="加減兩步驟｜二上單元六練習遊戲">
+<meta property="og:description" content="三個數連加、連減、加減混合與兩步驟應用題。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:image" content="https://chun115.github.io/2548/og-twostep.png">
+<meta property="og:url" content="https://chun115.github.io/2548/twostep.html">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<script>
+function w2(a,op1,b){return op1==='+'?a+b:a-b;}
+window.GAME={
+  title:'加減兩步驟',emoji:'🚌',sub:'二上・單元六：連加、連減、加減兩步驟',color:'#d6336c',bg:'#fff0f6',line:'#f7d6e6',
+  modes:[
+    {id:'add3',icon:'➕',name:'三個數連加',desc:'25 + 18 + 30 = ?'},
+    {id:'sub3',icon:'➖',name:'三個數連減',desc:'80 − 25 − 17 = ?'},
+    {id:'mix',icon:'🔀',name:'加減混合',desc:'先算前面，再算後面'},
+    {id:'story',icon:'🚌',name:'兩步驟應用題',desc:'公車上車、下車，現在有幾人？'},
+  ],
+  speedStars:[4,7,10],
+  make(m){
+    if(m==='add3'){
+      if(Math.random()<.3){ // 交換順序、湊整十
+        const a=RI(11,49),c=10-a%10+10*RI(0,2),b=RI(11,40);
+        return {prompt:`${a} + ${b} + ${c}<br><span style="font-size:18px">（先把 ${a} 和 ${c} 加起來比較快喔）</span>`,ans:a+b+c,opts:numOpts(a+b+c,[a+b+c-10,a+b+c+10]),miss:`${a} + ${c} = ${a+c}，${a+c} + ${b} = <b>${a+b+c}</b>`};}
+      const a=RI(10,50),b=RI(10,50),c=RI(10,50);const s=a+b+c;
+      return {prompt:`${a} + ${b} + ${c} = ?`,big:true,ans:s,opts:numOpts(s,[a+b,s-10,s+10]),miss:`${a} + ${b} = ${a+b}，${a+b} + ${c} = <b>${s}</b>`};
+    }
+    if(m==='sub3'){
+      const a=RI(60,99),b=RI(10,30),c=RI(5,a-b-5);const s=a-b-c;
+      return {prompt:`${a} − ${b} − ${c} = ?`,big:true,ans:s,opts:numOpts(s,[a-b,a-b+c,s+10].filter(x=>x!==s)),miss:`${a} − ${b} = ${a-b}，${a-b} − ${c} = <b>${s}</b>`};
+    }
+    if(m==='mix'){
+      if(Math.random()<.5){const a=RI(20,70),b=RI(10,30),c=RI(5,a+b-5);const s=a+b-c;
+        return {prompt:`${a} + ${b} − ${c} = ?`,big:true,ans:s,opts:numOpts(s,[a+b+c,a+b,a-b+c>0?a-b+c:s+10].filter(x=>x!==s)),miss:`${a} + ${b} = ${a+b}，${a+b} − ${c} = <b>${s}</b>`};}
+      const a=RI(40,90),b=RI(10,a-10),c=RI(5,40);const s=a-b+c;
+      return {prompt:`${a} − ${b} + ${c} = ?`,big:true,ans:s,opts:numOpts(s,[a-b-c>0?a-b-c:s-10,a-b,a+b+c].filter(x=>x!==s)),miss:`${a} − ${b} = ${a-b}，${a-b} + ${c} = <b>${s}</b>`};
+    }
+    const k=R(4);
+    if(k===0){const a=RI(15,40),b=RI(5,20),c=RI(3,a+b-3);const s=a+b-c;
+      return {prompt:`公車上有 ${a} 人，第一站上車 ${b} 人，<br>第二站下車 ${c} 人。現在車上有幾人？`,ans:s,opts:numOpts(s,[a+b+c,a+b],' 人'),miss:`${a} + ${b} − ${c} = <b>${s} 人</b>`};}
+    if(k===1){const a=RI(50,99),b=RI(10,25),c=RI(5,a-b-5);const s=a-b-c;
+      return {prompt:`媽媽有 ${a} 元，買麵包花了 ${b} 元，<br>買牛奶花了 ${c} 元。還剩幾元？`,ans:s,opts:numOpts(s,[a-b,a-b+c],' 元'),miss:`${a} − ${b} − ${c} = <b>${s} 元</b>`};}
+    if(k===2){const a=RI(10,30),b=RI(10,30),c=RI(10,30);const s=a+b+c;
+      return {prompt:`果園第一天摘了 ${a} 顆橘子，第二天 ${b} 顆，<br>第三天 ${c} 顆。一共摘了幾顆？`,ans:s,opts:numOpts(s,[a+b,s-10],' 顆'),miss:`${a} + ${b} + ${c} = <b>${s} 顆</b>`};}
+    const a=RI(30,60),b=RI(10,a-5),c=RI(10,30);const s=a-b+c;
+    return {prompt:`圖書館有 ${a} 本漫畫，借出 ${b} 本，<br>又買進 ${c} 本。現在有幾本？`,ans:s,opts:numOpts(s,[a-b-c>0?a-b-c:s-10,a+b+c],' 本'),miss:`${a} − ${b} + ${c} = <b>${s} 本</b>`};
+  }
+};
+</script>
+<script src="engine.js"></script>
+</body>
+</html>

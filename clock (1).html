@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>鐘面大冒險</title>
+<meta name="description" content="二上單元八練習遊戲：認識鐘面、幾時幾分、沒有數字的鐘面、經過多久。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="鐘面大冒險｜二上單元八 時間">
+<meta property="og:description" content="二上單元八練習遊戲：認識鐘面、幾時幾分、沒有數字的鐘面、經過多久。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:image" content="https://chun115.github.io/2548/og-clock.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://chun115.github.io/2548/clock.html">
+<meta name="twitter:card" content="summary_large_image">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef8f0;--ink:#2b2340;--soft:#6b6280;--card:#fff;--line:#d5ecd9;
+  --hour:#3b5bdb;--min:#e8590c;--face:#fffdf5;--rim:#9fd18b;--hl:#ffd98a;--tick:#e03131;
+  --ok:#27ae60;--bad:#e74c3c;--blue:#5b7cfa;--teal:#2bb3a3}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:"Noto Sans TC",system-ui,sans-serif;display:flex;justify-content:center;padding:20px 14px 40px}
+.wrap{width:100%;max-width:560px}
+h1{font-size:30px;font-weight:900;margin:6px 0 2px;text-align:center}
+.sub{color:var(--soft);text-align:center;margin:0 0 18px;font-size:15px}
+.card{background:var(--card);border:3px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 6px 0 var(--line)}
+.label{font-weight:700;margin:4px 0 10px;font-size:16px}
+.modes{display:grid;gap:10px}
+.mode{display:flex;align-items:center;gap:12px;text-align:left;border:3px solid var(--line);background:#fbfffb;border-radius:18px;padding:12px 14px;cursor:pointer;font:inherit;color:inherit;transition:.15s}
+.mode:hover{border-color:var(--teal);transform:translateY(-1px)}
+.mode .ic{font-size:30px}.mode b{display:block;font-size:17px}.mode span{color:var(--soft);font-size:13px}
+.voice{display:flex;align-items:center;justify-content:space-between;margin:0 0 16px;padding:10px 14px;border:3px solid var(--line);border-radius:16px;background:#fbfffb;font-weight:700}
+.toggle{border:none;border-radius:999px;padding:8px 16px;font:900 15px "Noto Sans TC";cursor:pointer;background:var(--line);color:var(--soft)}
+.toggle.on{background:var(--teal);color:#fff}
+.hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:700;font-size:15px}
+.pill{background:#fff;border:2px solid var(--line);border-radius:999px;padding:5px 12px}
+.bar{height:12px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:12px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--blue));transition:width .3s linear}
+.prompt{text-align:center;font-size:24px;font-weight:900;margin:4px 0 8px;min-height:34px;line-height:1.4}
+.clockbox{display:flex;justify-content:center;margin:4px 0}
+svg.clock{width:min(78vw,300px);height:auto;touch-action:none;user-select:none}
+svg.clock.set{cursor:pointer}
+.say{display:block;margin:4px auto 8px;border:none;border-radius:999px;padding:6px 16px;font:700 15px "Noto Sans TC";background:#e8fbf8;color:#13806f;cursor:pointer}
+.say.hidden{display:none}
+.hint{text-align:center;color:var(--soft);min-height:22px;font-size:15px;margin-bottom:10px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{border:none;border-radius:18px;padding:16px 0;font:900 26px "Noto Sans TC";background:#eef3ff;color:var(--ink);cursor:pointer;box-shadow:0 5px 0 #d3ddf7;transition:.1s}
+.opt:active{transform:translateY(3px);box-shadow:0 2px 0 #d3ddf7}
+.opt.right{background:var(--ok);color:#fff;box-shadow:0 5px 0 #1e8449}
+.opt.wrong{background:var(--bad);color:#fff;box-shadow:0 5px 0 #a93226;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.btn{display:block;width:100%;border:none;border-radius:16px;padding:14px;font:900 18px "Noto Sans TC";background:var(--teal);color:#fff;cursor:pointer;box-shadow:0 5px 0 #1d8a7d;margin-top:14px}
+.btn.ghost{background:#fff;color:var(--ink);border:3px solid var(--line);box-shadow:0 5px 0 var(--line)}
+.big{font-size:64px;text-align:center;margin:4px 0}
+.score{text-align:center;font-size:22px;font-weight:900}
+.stars{text-align:center;font-size:40px;letter-spacing:6px;margin:8px 0}
+.miss{margin-top:14px;background:#fff6f4;border-radius:14px;padding:12px 14px;font-size:16px}
+.miss div{padding:3px 0}
+.learn p{font-size:17px;line-height:1.7;margin:10px 0}
+.learn .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.learn svg{width:150px}
+.best{text-align:center;color:var(--soft);font-size:14px;margin-top:10px}
+.hidden{display:none}
+.fx{position:fixed;pointer-events:none;font-size:28px;animation:fly 1s forwards}
+@keyframes fly{to{transform:translateY(-120px) scale(1.4);opacity:0}}
+.backhome{display:inline-block;margin:0 0 6px;padding:6px 14px;border-radius:999px;background:#fff;border:2px solid rgba(0,0,0,.08);color:#2b2340;font-weight:700;font-size:14px;text-decoration:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="backhome" href="./">← 遊戲目錄</a>
+  <h1>🕐 鐘面大冒險</h1>
+  <p class="sub">二上・單元八：認識鐘面、報讀時刻、經過的時間</p>
+
+  <div id="home" class="card">
+    <div class="label">選擇遊戲</div>
+    <div class="modes">
+      <button class="mode" data-mode="learn"><span class="ic">📖</span><div><b>先來認識鐘面</b><span>時針、分針、大格、小格</span></div></button>
+      <button class="mode" data-mode="read"><span class="ic">👀</span><div><b>看鐘說幾時</b><span>10 題，看時鐘選出正確的時間</span></div></button>
+      <button class="mode" data-mode="set"><span class="ic">👆</span><div><b>撥一撥</b><span>把短針撥到正確的位置</span></div></button>
+      <button class="mode" data-mode="quiz"><span class="ic">🔍</span><div><b>鐘面小偵探</b><span>時針還是分針？大格還是小格？</span></div></button>
+      <button class="mode" data-mode="hm"><span class="ic">⏱️</span><div><b>幾時幾分</b><span>看長針和短針，報讀時刻</span></div></button>
+      <button class="mode" data-mode="blank"><span class="ic">🫥</span><div><b>沒有數字的鐘面</b><span>鐘面上沒有數字，你還看得懂嗎？</span></div></button>
+      <button class="mode" data-mode="elapsed"><span class="ic">⏳</span><div><b>經過多久？</b><span>從幾時到幾時，經過幾小時、幾分鐘</span></div></button>
+      <button class="mode" data-mode="speed"><span class="ic">⚡</span><div><b>60 秒快閃</b><span>所有題型混在一起，一分鐘能答對幾題？</span></div></button>
+    </div>
+    <div class="best" id="best"></div>
+  </div>
+
+  <div id="learnView" class="card hidden learn"></div>
+
+  <div id="game" class="card hidden">
+    <div class="hud">
+      <span class="pill" id="hudL">第 1 題</span>
+      <span class="pill" id="hudM">🔥 0</span>
+      <span class="pill" id="hudR">⭐ 0</span>
+    </div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="prompt" id="prompt"></div>
+    <div class="clockbox" id="clockbox"></div>
+    <div class="hint" id="hint"></div>
+    <div class="opts" id="opts"></div>
+    <button class="btn hidden" id="confirm">✅ 撥好了</button>
+    <button class="btn ghost" id="quit">回首頁</button>
+  </div>
+
+  <div id="result" class="card hidden">
+    <div class="big" id="rIcon">🎉</div>
+    <div class="score" id="rScore"></div>
+    <div class="stars" id="rStars"></div>
+    <div class="miss hidden" id="rMiss"></div>
+    <button class="btn" id="again">再玩一次</button>
+    <button class="btn ghost" id="home2">回首頁</button>
+  </div>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const CN=['','一','二','三','四','五','六','七','八','九','十','十一','十二'];
+let mode,qi,score,streak,total,timeLeft,timer,cur,locked,misses,setHour;
+
+function show(id){['home','game','result','learnView'].forEach(x=>$(x).classList.toggle('hidden',x!==id));}
+
+/* ---------- 畫時鐘 ---------- */
+function pt(deg,r){const a=deg*Math.PI/180;return [ (r*Math.sin(a)).toFixed(2), (-r*Math.cos(a)).toFixed(2) ];}
+function wedge(a1,a2,r){const p1=pt(a1,r),p2=pt(a2,r);return `M0,0 L${p1} A${r},${r} 0 ${a2-a1>180?1:0} 1 ${p2} Z`;}
+function clockSVG(o){
+  // o: {hour, showMin=true, hl:'hour'|'minute'|null, arc:{start,size}|null, cls}
+  let s=`<svg class="clock ${o.cls||''}" viewBox="-110 -110 220 220" xmlns="http://www.w3.org/2000/svg">`;
+  s+=`<circle r="106" fill="var(--rim)"/><circle r="96" fill="var(--face)"/>`;
+  if(o.arc){
+    s+=`<path d="${wedge(o.arc.start,o.arc.start+o.arc.size,96)}" fill="var(--hl)" opacity=".9"/>`;
+    [o.arc.start,o.arc.start+o.arc.size].forEach(a=>{const p1=pt(a,82),p2=pt(a,100);s+=`<line x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}" stroke="var(--tick)" stroke-width="3.5"/>`;});
+  }
+  for(let i=0;i<60;i++){
+    const big=i%5===0, p1=pt(i*6,big?84:89), p2=pt(i*6,95);
+    s+=`<line x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}" stroke="#555" stroke-width="${big?2.6:1.2}"/>`;
+  }
+  if(o.nums!==false)for(let n=1;n<=12;n++){const p=pt(n*30,70);s+=`<text x="${p[0]}" y="${p[1]}" text-anchor="middle" dominant-baseline="central" font-size="19" font-weight="900" fill="#2b2340" font-family="Noto Sans TC, sans-serif">${n}</text>`;}
+  const glow=c=>`stroke="var(--hl)" stroke-width="${c}" stroke-linecap="round"`;
+  if(o.hour!=null){
+    const ha=(o.hour%12)*30+(o.min||0)*0.5, hp=pt(ha,46);
+    if(o.hl==='hour')s+=`<line x1="0" y1="0" x2="${hp[0]}" y2="${hp[1]}" ${glow(18)}/>`;
+    s+=`<line id="hHand" x1="0" y1="0" x2="${hp[0]}" y2="${hp[1]}" stroke="var(--hour)" stroke-width="8" stroke-linecap="round"/>`;
+  }
+  if(o.showMin!==false){
+    const mp=pt((o.min||0)*6,80);
+    if(o.hl==='minute')s+=`<line x1="0" y1="0" x2="${mp[0]}" y2="${mp[1]}" ${glow(14)}/>`;
+    s+=`<line x1="0" y1="0" x2="${mp[0]}" y2="${mp[1]}" stroke="var(--min)" stroke-width="4.5" stroke-linecap="round"/>`;
+  }
+  s+=`<circle r="6" fill="#2b2340"/></svg>`;
+  return s;
+}
+
+/* ---------- 音效 ---------- */
+let ac;
+function sfx(type){
+  try{
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==='suspended')ac.resume();
+    const t0=ac.currentTime;
+    const note=(f,t,d,wave,vol)=>{const o=ac.createOscillator(),g=ac.createGain();o.type=wave||'triangle';
+      o.frequency.setValueAtTime(f,t0+t);g.gain.setValueAtTime(.0001,t0+t);
+      g.gain.exponentialRampToValueAtTime(vol||.2,t0+t+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+t+d);
+      o.connect(g);g.connect(ac.destination);o.start(t0+t);o.stop(t0+t+d+.03);};
+    if(type==='ok'){ // 叮咚叮～ 上升音階 + 亮晶晶
+      [523,659,784,1047].forEach((f,i)=>note(f,i*.07,.28));
+      note(2093,.30,.35,'sine',.07);note(2637,.38,.35,'sine',.05);
+    }else if(type==='combo'){ // 連對 5 題的小號角
+      [[523,0,.12],[523,.12,.12],[523,.24,.12],[659,.36,.18],[784,.56,.14],[659,.70,.12],[1047,.84,.5]].forEach(n=>note(n[0],n[1],n[2],'square',.09));
+      [1568,2093,2637,3136].forEach((f,i)=>note(f,.9+i*.06,.3,'sine',.05));
+    }else if(type==='bad'){ // 嗚嗚～ 答錯
+      const o=ac.createOscillator(),g=ac.createGain();o.type='sawtooth';
+      o.frequency.setValueAtTime(330,t0);o.frequency.linearRampToValueAtTime(260,t0+.25);
+      o.frequency.setValueAtTime(260,t0+.3);o.frequency.linearRampToValueAtTime(170,t0+.7);
+      g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.13,t0+.03);
+      g.gain.setValueAtTime(.13,t0+.22);g.gain.exponentialRampToValueAtTime(.02,t0+.28);
+      g.gain.exponentialRampToValueAtTime(.13,t0+.33);g.gain.exponentialRampToValueAtTime(.0001,t0+.75);
+      o.connect(g);g.connect(ac.destination);o.start(t0);o.stop(t0+.8);
+    }else if(type==='win'){ // 過關歡呼
+      [[523,0],[659,.1],[784,.2],[1047,.3],[784,.45],[1047,.55]].forEach(n=>note(n[0],n[1],.22,'square',.08));
+      [1047,1319,1568].forEach(f=>note(f,.7,.8,'triangle',.1));
+    }else if(type==='end'){
+      [392,523,659].forEach((f,i)=>note(f,i*.12,.35,'triangle',.15));
+    }
+  }catch(e){}
+}
+function beep(ok){sfx(ok?((streak+1)%5===0?'combo':'ok'):'bad');}
+const synth=null;const voiceOn=false;let zhVoice=null;function speak(){}
+
+function best(){try{return +localStorage.getItem('clockbest')||0}catch(e){return 0}}
+function setBest(v){try{localStorage.setItem('clockbest',v)}catch(e){}}
+function showBest(){const b=best();$('best').textContent=b?`⚡ 60 秒快閃最高紀錄：${b} 題`:'';}
+showBest();
+
+/* ---------- 認識鐘面 ---------- */
+function learn(){
+  $('learnView').innerHTML=`
+  <div class="row">${clockSVG({hour:7,hl:'hour'})}${clockSVG({hour:7,hl:'minute'})}</div>
+  <p>🟦 <b>短針</b>又叫作<b>時針</b>；🟧 <b>長針</b>又叫作<b>分針</b>。</p>
+  <p>⏰ 短針指著 <b>7</b>、長針指著 <b>12</b>，就是 <b>7 時</b>（也可以說 7 點）。上午 7 時，可以說「上午 7 時」。</p>
+  <div class="row">${clockSVG({hour:null,showMin:false,arc:{start:0,size:6}})}${clockSVG({hour:null,showMin:false,arc:{start:0,size:30}})}</div>
+  <p>📏 鐘面上相鄰兩條刻度線中間是 <b>1 小格</b>；從一個數字到下一個數字是 <b>1 大格</b>。</p>
+  <p>✋ <b>1 大格有 5 小格</b>，鐘面上一共有 <b>12 大格</b>。</p>
+  <button class="btn" id="learnGo">我懂了，開始挑戰！</button>
+  <button class="btn ghost" id="learnHome">回首頁</button>`;
+  show('learnView');
+  speak('短針又叫作時針，長針又叫作分針。短針指著7，長針指著12，就是7時。1大格有5小格，鐘面上一共有12大格。',0.9);
+  $('learnGo').onclick=()=>start('read');
+  $('learnHome').onclick=()=>{synth&&synth.cancel();show('home');};
+}
+
+/* ---------- 遊戲流程 ---------- */
+document.querySelectorAll('.mode').forEach(m=>m.onclick=()=>m.dataset.mode==='learn'?(mode='learn',learn()):start(m.dataset.mode));
+$('quit').onclick=()=>{clearInterval(timer);synth&&synth.cancel();show('home');showBest();};
+$('home2').onclick=()=>{show('home');showBest();};
+$('again').onclick=()=>start(mode);
+
+function start(m){
+  mode=m;qi=0;score=0;streak=0;misses=[];total=10;show('game');
+  clearInterval(timer);
+  if(m==='speed'){timeLeft=60;timer=setInterval(()=>{timeLeft--;updateHud();if(timeLeft<=0){clearInterval(timer);finish();}},1000);}
+  next();
+}
+function updateHud(){
+  if(mode==='speed'){$('bar').style.width=(timeLeft/60*100)+'%';$('hudL').textContent='⏰ '+timeLeft+' 秒';}
+  else{$('bar').style.width=(qi/total*100)+'%';$('hudL').textContent=`第 ${Math.min(qi+1,total)} / ${total} 題`;}
+  $('hudM').textContent='🔥 連對 '+streak;$('hudR').textContent='⭐ '+score;
+}
+const rnd=n=>Math.floor(Math.random()*n);
+const shuffle=a=>a.sort(()=>Math.random()-.5);
+let lastH=0;
+function randHour(){let h;do{h=1+rnd(12);}while(h===lastH);lastH=h;return h;}
+
+
+function hmText(h,m){return m===0?`${h} 時`:`${h} 時 ${m} 分`;}
+function hmOpts(h,m){
+  const s=new Map();const add=(hh,mm)=>{hh=(hh+11)%12+1;if(mm<0||mm>59)return;const t=hmText(hh,mm);if(!s.has(t))s.set(t,t);};
+  add(h,m);
+  if(m%5===0&&m>0)add(h,m/5);          // 把長針指的數字當成分
+  if(m>=30)add(h+1,m);                  // 短針快到下一個數字，看成下一時
+  add(h,(m+5)%60);add(h-1,m);add(h,Math.abs(m-5));add(h,(m+10)%60);
+  return shuffle([...s.keys()].slice(0,4)).map(t=>({v:t,t}));
+}
+function makeHM(nums){
+  const h=1+rnd(12);const m=Math.random()<.75?5*(1+rnd(11)):1+rnd(59);
+  const t=hmText(h,m);
+  return {kind:'choice',prompt:nums===false?'沒有數字的鐘面，現在是幾時幾分？':'現在是幾時幾分？',clock:{hour:h,min:m,nums},ans:t,opts:hmOpts(h,m),
+    say:'',sayAns:'',miss:`短針在 ${h} 和 ${h%12+1} 之間 → ${h} 時；長針走了 ${m} 小格 → ${m} 分，是 ${t}`};
+}
+function makeBlank(){
+  if(Math.random()<.5){const q=makeRead();q.clock.nums=false;q.prompt='沒有數字的鐘面，這是幾時？';return q;}
+  return makeHM(false);
+}
+function twoClocks(h1,m1,h2,m2){
+  const one=(h,m,l)=>`<div style="text-align:center;font-weight:900">${clockSVG({hour:h,min:m}).replace('class="clock "','class="clock" style="width:min(40vw,160px)"')}<div>${l}</div></div>`;
+  return `<div style="display:flex;gap:14px;align-items:center">${one(h1,m1,'開始')}<div style="font-size:30px">➡️</div>${one(h2,m2,'結束')}</div>`;
+}
+function makeElapsed(){
+  if(Math.random()<.5){ // 經過幾小時
+    const h1=1+rnd(9),d=1+rnd(Math.min(5,12-h1));const h2=h1+d;
+    return {kind:'choice',prompt:`從 ${h1} 時到 ${h2} 時，經過幾小時？`,html:twoClocks(h1,0,h2,0),ans:d,
+      opts:shuffle([...new Set([d,d+1,Math.max(1,d-1)===d?d+2:d-1,h2])].slice(0,4)).map(v=>({v,t:v+' 小時'})),say:'',sayAns:'',miss:`短針從 ${h1} 走到 ${h2}，走了 ${d} 大格，經過 ${d} 小時`};
+  }
+  const h=1+rnd(11);const m1=5*rnd(8),d=5*(1+rnd(Math.min(6,(55-m1)/5)));const m2=m1+d;
+  const wr=[d,d/5,m2,d+5,Math.abs(d-5)||d+10];
+  return {kind:'choice',prompt:`從 ${hmText(h,m1)} 到 ${hmText(h,m2)}，<br>經過幾分鐘？`,html:twoClocks(h,m1,h,m2),ans:d,
+    opts:shuffle((()=>{const t=new Set(wr);let k=10;while(t.size<4){t.add(d+k);k+=5;}return [...t].slice(0,4);})()).map(v=>({v,t:v+' 分鐘'})),say:'',sayAns:'',miss:`長針從 ${m1/5===0?12:m1/5} 走到 ${m2/5}，走了 ${d} 小格，經過 ${d} 分鐘`};
+}
+function makeAny(){return pick([makeRead,makeHM,makeHM,makeQuiz,makeBlank,makeElapsed])();}
+function pick(a){return a[rnd(a.length)];}
+
+function makeRead(){
+  const h=randHour();
+  const s=new Set([h]);
+  if(h!==12)s.add(12);              // 把長針看成時針的常見錯誤
+  s.add(h%12+1);s.add((h+10)%12+1);
+  while(s.size<4)s.add(1+rnd(12));
+  const opts=shuffle([...s].slice(0,4)).map(v=>({v,t:v+' 時'}));
+  return {kind:'choice',prompt:'這個時鐘是幾時？',clock:{hour:h},ans:h,opts,
+    say:'這個時鐘是幾時？',sayAns:`短針指著${h}，長針指著12，是${h}時`,
+    miss:`短針指著 ${h}、長針指著 12 → ${h} 時`};
+}
+function makeSet(){
+  const h=randHour();const ampm=Math.random()<.4?(Math.random()<.5?'上午 ':'下午 '):'';
+  return {kind:'set',prompt:`請把短針撥到 <b>${ampm}${h} 時</b>`,ans:h,
+    say:`請把短針撥到${ampm}${h}時`,sayAns:`${h}時，短針要指著${h}`,
+    miss:`${h} 時：短針指著 ${h}、長針指著 12`};
+}
+function makeQuiz(){
+  const k=rnd(8);
+  if(k===0||k===1){
+    const which=Math.random()<.5?'hour':'minute';const h=2+rnd(9);
+    const name=which==='hour'?'時針':'分針';
+    return {kind:'choice',prompt:'發亮的這根針叫作什麼？',clock:{hour:h,hl:which},ans:name,
+      opts:shuffle([{v:'時針',t:'時針'},{v:'分針',t:'分針'}]),
+      say:'發亮的這根針叫作什麼？',sayAns:which==='hour'?'短針叫作時針':'長針叫作分針',
+      miss:which==='hour'?'短針 → 時針':'長針 → 分針'};
+  }
+  if(k===2||k===3){
+    const big=Math.random()<.5;const size=big?30:6;const start=big?rnd(12)*30:rnd(60)*6;
+    const name=big?'1 大格':'1 小格';
+    return {kind:'choice',prompt:'塗顏色的地方是多少？',clock:{hour:null,showMin:false,arc:{start,size}},ans:name,
+      opts:shuffle([{v:'1 大格',t:'1 大格'},{v:'1 小格',t:'1 小格'}]),
+      say:'塗顏色的地方是1大格，還是1小格？',sayAns:big?'從一個數字到下一個數字，是1大格':'兩條刻度線中間，是1小格',
+      miss:big?'數字到下一個數字 → 1 大格':'兩條刻度線中間 → 1 小格'};
+  }
+  if(k===4)return {kind:'choice',prompt:'1 大格有幾小格？',clock:{hour:null,showMin:false,arc:{start:rnd(12)*30,size:30}},ans:5,
+      opts:shuffle([5,10,12,6].map(v=>({v,t:v+' 小格'}))),say:'1大格有幾小格？',sayAns:'1大格有5小格',miss:'1 大格有 5 小格'};
+  if(k===5)return {kind:'choice',prompt:'鐘面上一共有幾大格？',clock:{hour:null,showMin:false},ans:12,
+      opts:shuffle([12,5,10,60].map(v=>({v,t:v+' 大格'}))),say:'鐘面上一共有幾大格？',sayAns:'鐘面上有12大格',miss:'鐘面上有 12 大格'};
+  if(k===6){
+    const q=Math.random()<.5;
+    return {kind:'choice',prompt:q?'短針又叫作什麼針？':'長針又叫作什麼針？',clock:{hour:2+rnd(9)},ans:q?'時針':'分針',
+      opts:shuffle([{v:'時針',t:'時針'},{v:'分針',t:'分針'}]),say:q?'短針又叫作什麼針？':'長針又叫作什麼針？',
+      sayAns:q?'短針叫作時針':'長針叫作分針',miss:q?'短針 → 時針':'長針 → 分針'};
+  }
+  const h=randHour();const s=new Set([h]);if(h!==12)s.add(12);s.add(h%12+1);while(s.size<4)s.add(1+rnd(12));
+  return {kind:'choice',prompt:`短針指著 ${h}、長針指著 12，是幾時？`,clock:null,ans:h,
+    opts:shuffle([...s]).map(v=>({v,t:v+' 時'})),say:`短針指著${h}，長針指著12，是幾時？`,sayAns:`是${h}時`,
+    miss:`短針指著 ${h}、長針指著 12 → ${h} 時`};
+}
+
+function next(){
+  locked=false;
+  cur= mode==='set'?makeSet(): mode==='quiz'?makeQuiz(): mode==='hm'?makeHM(): mode==='blank'?makeBlank(): mode==='elapsed'?makeElapsed(): mode==='speed'?makeAny(): makeRead();
+  updateHud();
+  $('prompt').innerHTML=cur.prompt;$('hint').textContent='';
+  const box=$('clockbox'),o=$('opts');o.innerHTML='';
+  $('confirm').classList.toggle('hidden',cur.kind!=='set');
+  if(cur.kind==='set'){
+    setHour=null;
+    box.innerHTML=clockSVG({hour:12,cls:'set'});
+    box.querySelector('#hHand').style.visibility='hidden';
+    $('hint').textContent='點一下鐘面上的數字（也可以拖拉），放上短針';
+    bindSet(box.querySelector('svg'));
+  }else{
+    box.innerHTML=cur.html||(cur.clock?clockSVG(cur.clock):'');
+    cur.opts.forEach(x=>{const b=document.createElement('button');b.className='opt';b.textContent=x.t;b.dataset.v=x.v;b.onclick=()=>answer(b,x.v);o.appendChild(b);});
+  }
+  speak(cur.say);
+}
+
+function bindSet(svg){
+  let down=false;
+  const upd=e=>{
+    const r=svg.getBoundingClientRect();const x=e.clientX-r.left-r.width/2,y=e.clientY-r.top-r.height/2;
+    let deg=Math.atan2(x,-y)*180/Math.PI;if(deg<0)deg+=360;
+    let h=Math.round(deg/30)%12;if(h===0)h=12;
+    if(h!==setHour){
+      setHour=h;const hand=svg.querySelector('#hHand'),p=pt(h*30,46);
+      hand.setAttribute('x2',p[0]);hand.setAttribute('y2',p[1]);hand.style.visibility='visible';
+      $('hint').textContent=`短針指著 ${h}`;
+    }
+  };
+  svg.onpointerdown=e=>{if(locked)return;down=true;try{svg.setPointerCapture(e.pointerId)}catch(_){}upd(e);};
+  svg.onpointermove=e=>{if(down&&!locked)upd(e);};
+  svg.onpointerup=svg.onpointercancel=()=>{down=false;};
+}
+$('confirm').onclick=()=>{
+  if(locked)return;
+  if(setHour==null){$('hint').textContent='先點鐘面上的數字，放上短針喔！';return;}
+  const ok=setHour===cur.ans;
+  if(!ok){$('clockbox').innerHTML=clockSVG({hour:cur.ans});}
+  result(ok,$('confirm'));
+};
+
+function answer(btn,v){
+  if(locked)return;
+  const ok=String(v)===String(cur.ans);
+  if(ok)btn.classList.add('right');
+  else{btn.classList.add('wrong');[...$('opts').children].forEach(b=>{if(b.dataset.v===String(cur.ans))b.classList.add('right');});}
+  result(ok,btn);
+}
+
+function result(ok,btn){
+  locked=true;beep(ok);
+  if(ok){
+    score++;streak++;
+    $('hint').textContent=streak>=5?'太厲害了！連對 '+streak+' 題 🔥':['答對了！','好棒！','厲害！','正確！'][rnd(4)];
+    burst(btn);
+    if(mode==='speed')synth&&synth.cancel();else speak('答對了！'+cur.sayAns);
+  }else{
+    streak=0;misses.push(cur.miss);
+    $('hint').textContent='沒關係，'+cur.miss.replace(' → ','，是 ');
+    speak('沒關係，'+cur.sayAns);
+  }
+  qi++;updateHud();
+  const wait=ok?(mode==='speed'?400:(voiceOn?2100:800)):(mode==='speed'?(voiceOn?2000:1000):(voiceOn?2800:1800));
+  setTimeout(()=>{if(mode==='speed'&&timeLeft<=0)return;if(mode!=='speed'&&qi>=total)finish();else next();},wait);
+}
+
+function burst(el){const r=el.getBoundingClientRect();for(let i=0;i<3;i++){const s=document.createElement('div');s.className='fx';s.textContent=['⭐','✨','🌟'][i];s.style.left=(r.left+r.width/2-14+(i-1)*30)+'px';s.style.top=r.top+'px';document.body.appendChild(s);setTimeout(()=>s.remove(),1000);}}
+
+function finish(){
+  clearInterval(timer);show('result');
+  let stars,text;
+  if(mode==='speed'){const b=best();const nb=score>b;if(nb)setBest(score);
+    text=`60 秒內答對 ${score} 題！`+(nb?'<br>🏆 新紀錄！':`<br><small>最高紀錄 ${Math.max(b,score)} 題</small>`);
+    stars=score>=20?3:score>=12?2:score>=6?1:0;}
+  else{text=`10 題答對 ${score} 題`;stars=score===10?3:score>=8?2:score>=5?1:0;}
+  $('rIcon').textContent=['💪','👍','🎉','🏆'][stars];
+  sfx(stars>=2?'win':'end');
+  $('rScore').innerHTML=text;$('rStars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+  speak(mode==='speed'?`時間到！你答對了${score}題`:`你答對了${score}題，`+['再加油喔','不錯喔','好棒','滿分，太厲害了'][stars],1);
+  const m=$('rMiss');
+  if(misses.length){m.innerHTML='<b>📝 再記一次：</b>'+[...new Set(misses)].map(x=>`<div>${x}</div>`).join('');m.classList.remove('hidden');}
+  else m.classList.add('hidden');
+}
+</script>
+</body>
+</html>

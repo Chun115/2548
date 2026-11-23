@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>200 以內的數</title>
+<meta name="description" content="二上單元一練習遊戲：數積木、百位十位個位、付錢、比大小、數的順序。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="200 以內的數｜二上單元一練習遊戲">
+<meta property="og:description" content="數積木、百位十位個位、付錢、比大小、數的順序。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:image" content="https://chun115.github.io/2548/og-num200.png">
+<meta property="og:url" content="https://chun115.github.io/2548/num200.html">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<script>
+/* 積木圖：百板、十條、一個 */
+function blocks(h,t,o){
+  const U=9;let x=6,s='',H=10*U+12;
+  for(let i=0;i<h;i++){s+=`<g transform="translate(${x},6)"><rect width="${10*U}" height="${10*U}" fill="#ff922b" stroke="#c4561b" stroke-width="2"/>`;
+    for(let k=1;k<10;k++)s+=`<line x1="${k*U}" y1="0" x2="${k*U}" y2="${10*U}" stroke="#c4561b" stroke-width=".8"/><line x1="0" y1="${k*U}" x2="${10*U}" y2="${k*U}" stroke="#c4561b" stroke-width=".8"/>`;
+    s+='</g>';x+=10*U+10;}
+  for(let i=0;i<t;i++){s+=`<g transform="translate(${x},6)"><rect width="${U}" height="${10*U}" fill="#4dabf7" stroke="#1c6fb5" stroke-width="1.5"/>`;
+    for(let k=1;k<10;k++)s+=`<line x1="0" y1="${k*U}" x2="${U}" y2="${k*U}" stroke="#1c6fb5" stroke-width=".8"/>`;s+='</g>';x+=U+5;}
+  if(t)x+=6;
+  for(let i=0;i<o;i++){const col=Math.floor(i/5),row=i%5;s+=`<rect x="${x+col*(U+4)}" y="${6+10*U-U-row*(U+4)}" width="${U}" height="${U}" fill="#ffffff" stroke="#555" stroke-width="1.5"/>`;}
+  if(o)x+=Math.ceil(o/5)*(U+4);
+  const W=Math.max(x+6,120);
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:min(92vw,${Math.min(W*2.2,500)}px);height:auto">${s}</svg>`;
+}
+/* 錢幣圖 */
+function money(c100,c50,c10,c5,c1){
+  let s='',x=6;const y=8;
+  for(let i=0;i<c100;i++){s+=`<g transform="translate(${x},${y})"><rect width="96" height="50" rx="6" fill="#b2f2bb" stroke="#2f9e44" stroke-width="2.5"/><text x="48" y="32" text-anchor="middle" font-size="22" font-weight="900" fill="#2b8a3e" font-family="Noto Sans TC">100元</text></g>`;x+=104;}
+  const coin=(v,r,fill,stroke,fs)=>{s+=`<g transform="translate(${x+r},${y+25})"><circle r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="2.5"/><text text-anchor="middle" dominant-baseline="central" font-size="${fs}" font-weight="900" fill="#5c3d00" font-family="Noto Sans TC">${v}</text></g>`;x+=2*r+6;};
+  for(let i=0;i<c50;i++)coin(50,24,'#ffe066','#d9a400',17);
+  for(let i=0;i<c10;i++)coin(10,20,'#ffd8a8','#c27c0e',16);
+  for(let i=0;i<c5;i++)coin(5,17,'#e9ecef','#868e96',15);
+  for(let i=0;i<c1;i++)coin(1,14,'#e9ecef','#868e96',13);
+  const W=x+4;
+  return `<svg viewBox="0 0 ${W} 66" style="width:min(92vw,${Math.min(W*1.4,520)}px);height:auto">${s}</svg>`;
+}
+const BIG=n=>`<span style="font-size:40px">${n}</span>`;
+
+window.GAME={
+  title:'200 以內的數',emoji:'🧱',sub:'二上・單元一：數到 200、位值、付錢、比大小',color:'#f76707',
+  modes:[
+    {id:'blocks',icon:'🧱',name:'數積木',desc:'看百板、十條、一個，說出是多少'},
+    {id:'place',icon:'🔢',name:'百位十位個位',desc:'幾個百、幾個十、幾個一'},
+    {id:'money',icon:'💰',name:'付錢',desc:'數一數一共是幾元'},
+    {id:'compare',icon:'⚖️',name:'比大小',desc:'選 ＞、＜ 或 ＝'},
+    {id:'seq',icon:'🐾',name:'數的順序',desc:'數數接龍，找出空格的數'},
+  ],
+  make(m){
+    if(m==='blocks'){
+      const h=Math.random()<.8?1:(Math.random()<.5?0:2);let t=R(10),o=R(10);
+      if(h===2){t=0;o=0;}
+      const n=h*100+t*10+o;
+      const wr=[h*100+o*10+t, h*100+t+o*10, t*10+o, n+10, n-10, n+1];
+      return {prompt:'這些積木一共是多少？',visual:blocks(h,t,o),ans:n,opts:numOpts(n,wr.filter(v=>v!==n&&v>=0)),
+        miss:`${h} 個百、${t} 個十、${o} 個一，是 <b>${n}</b>`};
+    }
+    if(m==='place'){
+      const k=R(4);const h=1,t=R(10),o=R(10);const n=h*100+t*10+o;
+      if(k===0){ // 有缺位的數
+        const tt=Math.random()<.5?0:t, oo=tt===0?RI(1,9):(Math.random()<.5?0:o);const v=100+tt*10+oo;
+        const wr=[tt===0?10+oo:110+oo, tt===0?100+oo*10:100+tt, 10*tt+oo+10, v+10];
+        return {prompt:`1 個百、${tt} 個十、${oo} 個一<br>是多少？`,ans:v,opts:numOpts(v,wr.filter(x=>x!==v)),miss:`1 個百、${tt} 個十、${oo} 個一是 <b>${v}</b>，沒有的位要寫 0`};
+      }
+      if(k===1){const pos=pick(['百','十','個']);const d=pos==='百'?h:pos==='十'?t:o;
+        const s=new Set([d,h,t,o]);let x=0;while(s.size<4){s.add(x);x++;}
+        return {prompt:`${BIG(n)}<br>${pos}位的數字是幾？`,ans:d,opts:shuffle([...s].slice(0,4)).map(v=>({v,t:v})),miss:`${n} 的${pos}位數字是 <b>${d}</b>`};}
+      if(k===2){ // 化聚：幾個十
+        const v=10+t;return {prompt:`${BIG(n)}<br>是 □ 個十和 ${o} 個一`,ans:v,opts:numOpts(v,[t,1,v+10]),miss:`${n} 是 <b>${v}</b> 個十和 ${o} 個一（1 個百 = 10 個十）`};}
+      const tens=RI(10,19);const v=tens*10;
+      return {prompt:`${tens} 個十是多少？`,ans:v,opts:numOpts(v,[tens,tens*10+10,tens+10,100+tens]),miss:`${tens} 個十是 <b>${v}</b>`};
+    }
+    if(m==='money'){
+      if(Math.random()<.25){const k=RI(10,19);const v=k*10;return {prompt:`${k} 個 10 元一共是幾元？`,visual:money(0,0,Math.min(k,8),0,0)+(k>8?`<div style="align-self:center;font-weight:900;font-size:20px">…共 ${k} 個</div>`:''),ans:v,opts:numOpts(v,[k,v+10,v-10],' 元'),miss:`${k} 個 10 元是 <b>${v} 元</b>`};}
+      const c100=Math.random()<.85?1:0,c50=R(2),c10=R(5),c5=R(2),c1=R(5);
+      const v=c100*100+c50*50+c10*10+c5*5+c1;
+      if(v===0)return this.make('money');
+      const cnt=c100+c50+c10+c5+c1;
+      return {prompt:'一共是幾元？',visual:money(c100,c50,c10,c5,c1),ans:v,opts:numOpts(v,[cnt,v+10,v-10,v+5,v-5].filter(x=>x>0),' 元'),miss:`一共是 <b>${v} 元</b>`};
+    }
+    if(m==='compare'){
+      let a,b,ta,tb;const k=R(3);
+      if(k===0){a=RI(100,200);b=Math.random()<.4?a:(Math.random()<.5?a+pick([1,10,-1,-10]):RI(100,200));if(b>200)b=a-1;ta=a;tb=b;}
+      else if(k===1){const x=RI(1,9)*10+RI(0,9);a=100+x;b=Math.random()<.5?a:(Math.random()<.5?100+x%10*10+Math.floor(x/10):a+pick([1,-1,10,-10]));ta=`100 + ${x}`;tb=b;}
+      else{a=RI(100,199);b=RI(100,199);if(Math.random()<.3)b=a;ta=a;tb=b;
+        // 十位個位對調的陷阱
+        if(Math.random()<.5){const t=Math.floor(a/10)%10,o=a%10;b=100+o*10+t;tb=b;}}
+      if(b>200){b=a-1;tb=b;}
+      const ans=a>b?'>':a<b?'<':'=';
+      return {prompt:`${ta} ○ ${tb}`,big:String(ta).length<5,ans,opts:[{v:'>',t:'＞'},{v:'<',t:'＜'},{v:'=',t:'＝'}],
+        miss:`${ta}${String(ta).includes('+')?` = ${a}`:''} ${ans==='>'?'＞':ans==='<'?'＜':'＝'} ${tb}`};
+    }
+    // seq
+    const step=pick([1,1,10,10,5,2]);let s=RI(100,200-4*step);const arr=[0,1,2,3].map(i=>s+i*step);const hole=RI(1,3);const v=arr[hole];
+    const shown=arr.map((x,i)=>i===hole?'<span style="color:var(--main)">?</span>':x).join('、');
+    return {prompt:`${step===1?'一個一個數':step===10?'十個十個數':step===5?'五個五個數':'兩個兩個數'}<br><span style="font-size:32px">${shown}</span>`,ans:v,
+      opts:numOpts(v,[v+1,v-1,v+10,v-10,v+step].filter(x=>x!==v)),miss:`${arr.join('、')}，空格是 <b>${v}</b>`};
+  }
+};
+</script>
+<script src="engine.js"></script>
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>面的大小比較</title>
+<meta name="description" content="二上單元十練習遊戲：疊一疊直接比較、數格子比大小、用一樣的格子比較。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="面的大小比較｜二上單元十練習遊戲">
+<meta property="og:description" content="疊一疊直接比較、數格子比大小、用一樣的格子比較。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:image" content="https://chun115.github.io/2548/og-area.png">
+<meta property="og:url" content="https://chun115.github.io/2548/area.html">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<script>
+/* 在 cols x rows 方格上長出 n 格相連的圖形 */
+function shape(n,cols,rows){
+  const set=new Set();const k=(x,y)=>x+','+y;let cells=[[R(cols),R(rows)]];set.add(k(...cells[0]));
+  while(cells.length<n){const [x,y]=pick(cells);const [dx,dy]=pick([[1,0],[-1,0],[0,1],[0,-1]]);const nx=x+dx,ny=y+dy;
+    if(nx<0||ny<0||nx>=cols||ny>=rows||set.has(k(nx,ny)))continue;set.add(k(nx,ny));cells.push([nx,ny]);}
+  return cells;
+}
+function grid(cells,cols,rows,color,label,S){
+  S=S||24;let g='';
+  for(let x=0;x<=cols;x++)g+=`<line x1="${x*S}" y1="0" x2="${x*S}" y2="${rows*S}" stroke="#ced4da" stroke-width="1"/>`;
+  for(let y=0;y<=rows;y++)g+=`<line x1="0" y1="${y*S}" x2="${cols*S}" y2="${y*S}" stroke="#ced4da" stroke-width="1"/>`;
+  cells.forEach(([x,y])=>g+=`<rect x="${x*S+1}" y="${y*S+1}" width="${S-2}" height="${S-2}" fill="${color}" rx="2"/>`);
+  return `<g>${g}<text x="${cols*S/2}" y="${rows*S+24}" text-anchor="middle" font-size="18" font-weight="900" font-family="Noto Sans TC">${label}</text></g>`;
+}
+function two(a,b,cols,rows,S){
+  S=S||24;const W=cols*S;
+  return `<svg viewBox="-4 -4 ${W*2+44} ${rows*S+36}" style="width:min(92vw,460px);height:auto">${grid(a,cols,rows,'#ffa94d','甲',S)}<g transform="translate(${W+36},0)">${grid(b,cols,rows,'#74c0fc','乙',S)}</g></svg>`;
+}
+window.GAME={
+  title:'面的大小比較',emoji:'🟩',sub:'二上・單元十：直接比較、間接比較、數格子',color:'#2f9e44',bg:'#effaf1',line:'#d3eed8',
+  modes:[
+    {id:'overlap',icon:'📄',name:'疊一疊',desc:'把兩張紙疊起來，哪一張比較大？'},
+    {id:'count',icon:'🔢',name:'數格子',desc:'這個圖形有幾格？'},
+    {id:'compare',icon:'⚖️',name:'哪個比較大？',desc:'數一數格子，比一比'},
+    {id:'unit',icon:'🧩',name:'用什麼來比？',desc:'格子大小不一樣可以比嗎？'},
+  ],
+  speedStars:[5,8,12],
+  make(m){
+    if(m==='overlap'){
+      // 一張完全蓋住另一張
+      const w1=RI(5,8),h1=RI(4,6),w2=RI(2,w1-1),h2=RI(2,h1-1);const S=22;const big=Math.random()<.5?'甲':'乙';
+      const [bc,sc]=big==='甲'?['#ffa94d','#74c0fc']:['#74c0fc','#ffa94d'];const sl=big==='甲'?'乙':'甲';
+      const svg=`<svg viewBox="-4 -4 ${w1*S+80} ${h1*S+10}" style="width:min(80vw,300px);height:auto">
+        <rect x="0" y="0" width="${w1*S}" height="${h1*S}" fill="${bc}" stroke="#495057" stroke-width="2.5"/>
+        <rect x="0" y="0" width="${w2*S}" height="${h2*S}" fill="${sc}" stroke="#495057" stroke-width="2.5" opacity=".95"/>
+        <text x="${w2*S/2}" y="${h2*S/2+7}" text-anchor="middle" font-size="20" font-weight="900" font-family="Noto Sans TC">${sl}</text>
+        <text x="${w1*S-24}" y="${h1*S-12}" text-anchor="middle" font-size="20" font-weight="900" font-family="Noto Sans TC">${big}</text></svg>`;
+      return {prompt:'把兩張紙的一角對齊疊在一起，<br>哪一張紙比較大？',visual:svg,ans:big,opts:[{v:'甲',t:'甲'},{v:'乙',t:'乙'},{v:'一樣大',t:'一樣大'}],
+        miss:`${sl}被 ${big} 完全蓋住，<b>${big}</b> 比較大`};
+    }
+    if(m==='count'){
+      const cols=6,rows=4,n=RI(5,14);const c=shape(n,cols,rows);
+      return {prompt:'這個圖形有幾格？',visual:`<svg viewBox="-4 -4 ${cols*28+8} ${rows*28+8}" style="width:min(80vw,280px);height:auto">${grid(c,cols,rows,'#8ce99a','',28)}</svg>`,
+        ans:n,opts:numOpts(n,[n+1,n-1,n+2],' 格',1),miss:`一格一格數，共有 <b>${n} 格</b>`};
+    }
+    if(m==='compare'){
+      const cols=5,rows=4;const a=RI(5,12);let b=Math.random()<.25?a:RI(5,12);if(b===a&&Math.random()<.5)b=a+1;
+      const ca=shape(a,cols,rows),cb=shape(b,cols,rows);const ans=a>b?'甲':a<b?'乙':'一樣大';
+      const k=Math.random()<.6;
+      if(k)return {prompt:'哪一個圖形比較大？',visual:two(ca,cb,cols,rows),ans,opts:[{v:'甲',t:'甲'},{v:'乙',t:'乙'},{v:'一樣大',t:'一樣大'}],
+        miss:`甲 ${a} 格、乙 ${b} 格，${ans==='一樣大'?'<b>一樣大</b>':`<b>${ans}</b> 比較大`}`};
+      if(a===b)b=a+1;const cb2=shape(b,cols,rows);const d=Math.abs(a-b);
+      return {prompt:`${a>b?'甲':'乙'}比${a>b?'乙':'甲'}大幾格？`,visual:two(ca,cb2,cols,rows),ans:d,opts:numOpts(d,[a+b,Math.max(a,b)],' 格',1),miss:`${Math.max(a,b)} − ${Math.min(a,b)} = <b>${d} 格</b>`};
+    }
+    // unit
+    const k=R(2);
+    if(k===0){const a=RI(6,12);
+      return {prompt:`甲用<b>大格子</b>數是 ${a} 格，<br>乙用<b>小格子</b>數也是 ${a} 格。<br>哪一個比較大？`,ans:'甲',opts:[{v:'甲',t:'甲'},{v:'乙',t:'乙'},{v:'一樣大',t:'一樣大'}],
+        miss:`格數一樣，但甲的格子比較大，所以 <b>甲</b> 比較大`};}
+    return {prompt:'要比較兩張紙哪張比較大，<br>用格子數的時候要注意什麼？',cols:1,ans:'a',
+      opts:shuffle([{v:'a',t:'兩張都用一樣大的格子'},{v:'b',t:'格子越多越好'},{v:'c',t:'只看哪張比較長'}]),miss:'要用<b>一樣大的格子</b>去數，才能比較'};
+  }
+};
+</script>
+<script src="engine.js"></script>
+</body>
+</html>

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>加減應用</title>
+<meta name="description" content="二上單元四練習遊戲：加法和減法的關係、找出□、驗算、應用題。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="加減應用｜二上單元四練習遊戲">
+<meta property="og:description" content="加法和減法的關係、找出□、驗算、應用題。答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:image" content="https://chun115.github.io/2548/og-relation.png">
+<meta property="og:url" content="https://chun115.github.io/2548/relation.html">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+<body>
+<script>
+const BOX='<span style="display:inline-block;min-width:44px;border:3px dashed var(--main);border-radius:10px;color:var(--main)">?</span>';
+function trio(){const a=RI(12,59);let b=RI(11,40);if(b===a)b++;return [a,b,a+b];}
+window.GAME={
+  title:'加減應用',emoji:'🔄',sub:'二上・單元四：加法和減法的關係、驗算、找□',color:'#7048e8',bg:'#f4f0ff',line:'#e0d7fb',
+  modes:[
+    {id:'family',icon:'👨‍👩‍👦',name:'算式好朋友',desc:'知道加法，就知道減法'},
+    {id:'box',icon:'🔍',name:'找出 □',desc:'□ + 18 = 45，□ 是多少？'},
+    {id:'check',icon:'✅',name:'驗算小幫手',desc:'用哪個算式檢查答案對不對？'},
+    {id:'story',icon:'📖',name:'應用題',desc:'原來有多少？用掉多少？'},
+  ],
+  speedStars:[5,8,12],
+  make(m){
+    const [a,b,c]=trio();
+    if(m==='family'){
+      const k=R(3);
+      if(k===0)return {prompt:`${a} + ${b} = ${c}<br>所以 ${c} − ${b} = ${BOX}`,ans:a,opts:numOpts(a,[c+b,b,c-a===b?c:0].filter(x=>x>0&&x!==a)),miss:`${c} − ${b} = <b>${a}</b>（${a} + ${b} = ${c}）`};
+      if(k===1)return {prompt:`${a} + ${b} = ${c}<br>所以 ${c} − ${a} = ${BOX}`,ans:b,opts:numOpts(b,[c+a,a].filter(x=>x!==b)),miss:`${c} − ${a} = <b>${b}</b>（${a} + ${b} = ${c}）`};
+      return {prompt:`${c} − ${b} = ${a}<br>所以 ${a} + ${b} = ${BOX}`,ans:c,opts:numOpts(c,[a-b>0?a-b:c+10,c-10].filter(x=>x!==c)),miss:`${a} + ${b} = <b>${c}</b>（${c} − ${b} = ${a}）`};
+    }
+    if(m==='box'){
+      const k=R(4);
+      if(k===0)return {prompt:`${BOX} + ${b} = ${c}`,big:true,ans:a,opts:numOpts(a,[c+b]),miss:`□ = ${c} − ${b} = <b>${a}</b>`};
+      if(k===1)return {prompt:`${a} + ${BOX} = ${c}`,big:true,ans:b,opts:numOpts(b,[c+a]),miss:`□ = ${c} − ${a} = <b>${b}</b>`};
+      if(k===2)return {prompt:`${c} − ${BOX} = ${a}`,big:true,ans:b,opts:numOpts(b,[c+a]),miss:`□ = ${c} − ${a} = <b>${b}</b>`};
+      return {prompt:`${BOX} − ${b} = ${a}`,big:true,ans:c,opts:numOpts(c,[a-b>0?a-b:c-10,c+10]),miss:`□ = ${a} + ${b} = <b>${c}</b>`};
+    }
+    if(m==='check'){
+      // 減法用加法驗算
+      const right=`${a} + ${b} = ${c}`;
+      const wrongs=[`${c} + ${b} = ${c+b}`,`${a} − ${b} = ${a-b}`,`${c} + ${a} = ${c+a}`].filter(s=>!s.includes('= -'));
+      const ok=Math.random()<.7;
+      if(ok){const opts=shuffle([right,...shuffle(wrongs).slice(0,2)]).map(s=>({v:s,t:s}));
+        return {prompt:`${c} − ${b} = ${a}<br><span style="font-size:18px">要用哪一個算式驗算？</span>`,ans:right,opts,cols:1,miss:`用 <b>${right}</b> 驗算：差 + 減數 = 被減數`};}
+      // 判斷答案對不對
+      const bad=Math.random()<.5;const shown=bad?a+pick([10,-10,1,-1]):a;
+      return {prompt:`小明算：${c} − ${b} = ${shown}<br><span style="font-size:18px">用加法驗算看看，他算對了嗎？</span>`,ans:bad?'錯':'對',
+        opts:[{v:'對',t:'⭕ 對'},{v:'錯',t:'❌ 錯'}],miss:`${shown} + ${b} = ${shown+b}${bad?` 不等於 ${c}，所以<b>算錯了</b>，正確是 ${a}`:` = ${c}，所以<b>算對了</b>`}`};
+    }
+    const k=R(4);
+    if(k===0)return {prompt:`小美有一些彈珠，哥哥又給她 ${b} 顆，<br>現在有 ${c} 顆。小美原來有幾顆？`,ans:a,opts:numOpts(a,[c+b],' 顆'),miss:`${c} − ${b} = <b>${a} 顆</b>`};
+    if(k===1)return {prompt:`盤子裡有 ${c} 個餅乾，吃掉一些後，<br>剩下 ${a} 個。吃掉幾個？`,ans:b,opts:numOpts(b,[c+a],' 個'),miss:`${c} − ${a} = <b>${b} 個</b>`};
+    if(k===2)return {prompt:`公園裡有一些鴿子，飛走了 ${b} 隻，<br>還剩 ${a} 隻。原來有幾隻？`,ans:c,opts:numOpts(c,[a-b>0?a-b:c-10],' 隻'),miss:`${a} + ${b} = <b>${c} 隻</b>`};
+    return {prompt:`班上要做 ${c} 朵紙花，已經做了 ${a} 朵，<br>還要再做幾朵？`,ans:b,opts:numOpts(b,[c+a],' 朵'),miss:`${c} − ${a} = <b>${b} 朵</b>`};
+  }
+};
+</script>
+<script src="engine.js"></script>
+</body>
+</html>
