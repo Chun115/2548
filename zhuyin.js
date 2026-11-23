@@ -5,27 +5,36 @@ const T={"一": "ㄧ", "針": "ㄓㄣ", "個": "ㄍㄜˋ", "格": "ㄍㄜˊ", "�
 const OV={"數一數": ["ㄕㄨˇ", null, "ㄕㄨˇ"], "數數": ["ㄕㄨˇ", "ㄕㄨˋ"], "數到": ["ㄕㄨˇ", null], "數格": ["ㄕㄨˇ", null], "數積": ["ㄕㄨˇ", null], "一個一個數": [null, null, null, null, "ㄕㄨˇ"], "十個十個數": [null, null, null, null, "ㄕㄨˇ"], "五個五個數": [null, null, null, null, "ㄕㄨˇ"], "兩個兩個數": [null, null, null, null, "ㄕㄨˇ"], "格一格數": [null, null, null, "ㄕㄨˇ"], "去數": [null, "ㄕㄨˇ"], "要數": [null, "ㄕㄨˇ"], "子數": [null, "ㄕㄨˇ"], "容量": [null, "ㄌㄧㄤˋ"], "數量": ["ㄕㄨˋ", "ㄌㄧㄤˋ"], "的量": [null, "ㄌㄧㄤˋ"], "弟弟": [null, "ㄉㄧ˙"], "哥哥": [null, "ㄍㄜ˙"], "媽媽": [null, "ㄇㄚ˙"], "東西": [null, "ㄒㄧ˙"], "時候": [null, "ㄏㄡ˙"], "朋友": [null, "ㄧㄡ˙"], "認識": [null, "ㄕ˙"]};
 const KEYS=Object.keys(OV).sort((a,b)=>b.length-a.length);
 const css=`
-.zy{display:inline-flex;align-items:center;white-space:nowrap;margin:0 .03em}
+.zy{display:inline-flex;align-items:center;white-space:nowrap;margin:0 .02em}
 .zy .h{line-height:1}
-.zy .p{display:inline-flex;align-items:flex-end;margin-left:.06em;font-size:.38em;font-weight:500;font-style:normal;line-height:1;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
-.zy .p .c{display:flex;flex-direction:column;align-items:center}
-.zy .p .c i{display:block;font-style:normal;height:1.02em;line-height:1.02em}
-.zy .p .c .lt{height:.6em;line-height:.6em}
-.zy .p .t{display:block;width:.55em;line-height:1;margin-bottom:.35em;margin-left:-.05em}
-.zy .p .t.n{visibility:hidden}
+.zy svg.zp{display:block;flex:none;margin-left:.04em;overflow:visible}
 body:not(.nozy) .prompt,body:not(.nozy) .hint,body:not(.nozy) .miss,body:not(.nozy) .learn p{line-height:1.9!important}
-body.nozy .zy .p{display:none}
+body.nozy .zy svg.zp{display:none}
+body:not(.nozy) .opts.three .opt{font-size:19px!important;white-space:nowrap;padding-left:2px;padding-right:2px}
+body:not(.nozy) .opt{white-space:nowrap}
 body{padding-top:58px!important}
 #zyBtn{position:fixed;top:10px;right:10px;z-index:50;border:2px solid rgba(0,0,0,.1);background:#fff;border-radius:999px;padding:6px 12px;font:900 14px "Noto Sans TC",sans-serif;color:#2b2340;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.08)}
 #zyBtn.on{background:#2b2340;color:#fff}`;
 const st=document.createElement('style');st.textContent=css;document.head.appendChild(st);
 const CJK=/[\u4e00-\u9fff]/;
+/* 注音用 SVG 畫：每個符號 10 單位高，聲調畫成線條，所有手機位置一致 */
 function pin(z){
   if(!z)return '';
   let light=false;if(z.endsWith('˙')){light=true;z=z.slice(0,-1);}
   let tone='';const m=z.match(/[ˊˇˋ]$/);if(m){tone=m[0];z=z.slice(0,-1);}
-  return `<span class="p"><span class="c">${light?'<i class="lt">˙</i>':''}${[...z].map(c=>`<i>${c}</i>`).join('')}</span><span class="t${tone?'':' n'}">${tone||'ˊ'}</span></span>`;
+  const sy=[...z],top=light?4:0,H=top+sy.length*10,W=14;
+  let g='';
+  if(light)g+='<circle cx="5" cy="2" r="1.3" fill="currentColor"/>';
+  sy.forEach((c,k)=>{g+=`<text x="5" y="${top+k*10+8.8}" font-size="10" font-weight="500" text-anchor="middle" fill="currentColor" font-family="Noto Sans TC,PingFang TC,Microsoft JhengHei,sans-serif">${c}</text>`;});
+  const cy=top+(sy.length-1)*10+(sy.length>1?2.5:3.5);
+  const L=(a,b,c,d)=>`<line x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>`;
+  if(tone==='ˊ')g+=L(10.6,cy+1.8,13.2,cy-1.8);
+  if(tone==='ˋ')g+=L(10.6,cy-1.8,13.2,cy+1.8);
+  if(tone==='ˇ')g+=`<polyline points="10.3,${cy-1.6} 11.9,${cy+1.6} 13.5,${cy-1.6}" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>`;
+  const k=0.042; // 1 單位 = 0.042em（注音約為字的 42%）
+  return `<svg class="zp" viewBox="0 0 ${W} ${H}" style="width:${(W*k).toFixed(3)}em;height:${(H*k).toFixed(3)}em" aria-hidden="true">${g}</svg>`;
 }
+
 
 function convert(text){
   const out=[];let i=0;const sound=new Array(text.length).fill(null);
@@ -42,7 +51,7 @@ function skip(el){
     const t=e.tagName;
     if(t==='SCRIPT'||t==='STYLE'||t==='TITLE'||t==='svg'||t==='SVG'||e.namespaceURI==='http://www.w3.org/2000/svg')return true;
     if(e.id==='zyBtn'||(e.classList&&e.classList.contains('zy')))return true;
-    if(e.classList&&['hud','backhome','sub','best','foot','unit','pill'].some(c=>e.classList.contains(c)))return true;
+    if(e.classList&&['hud','backhome','sub','best','foot','unit','pill','d'].some(c=>e.classList.contains(c)))return true;
   }
   return false;
 }
