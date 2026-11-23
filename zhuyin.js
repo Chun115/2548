@@ -5,11 +5,15 @@ const T={"一": "ㄧ", "針": "ㄓㄣ", "個": "ㄍㄜˋ", "格": "ㄍㄜˊ", "�
 const OV={"數一數": ["ㄕㄨˇ", null, "ㄕㄨˇ"], "數數": ["ㄕㄨˇ", "ㄕㄨˋ"], "數到": ["ㄕㄨˇ", null], "數格": ["ㄕㄨˇ", null], "數積": ["ㄕㄨˇ", null], "一個一個數": [null, null, null, null, "ㄕㄨˇ"], "十個十個數": [null, null, null, null, "ㄕㄨˇ"], "五個五個數": [null, null, null, null, "ㄕㄨˇ"], "兩個兩個數": [null, null, null, null, "ㄕㄨˇ"], "格一格數": [null, null, null, "ㄕㄨˇ"], "去數": [null, "ㄕㄨˇ"], "要數": [null, "ㄕㄨˇ"], "子數": [null, "ㄕㄨˇ"], "容量": [null, "ㄌㄧㄤˋ"], "數量": ["ㄕㄨˋ", "ㄌㄧㄤˋ"], "的量": [null, "ㄌㄧㄤˋ"], "弟弟": [null, "ㄉㄧ˙"], "哥哥": [null, "ㄍㄜ˙"], "媽媽": [null, "ㄇㄚ˙"], "東西": [null, "ㄒㄧ˙"], "時候": [null, "ㄏㄡ˙"], "朋友": [null, "ㄧㄡ˙"], "認識": [null, "ㄕ˙"]};
 const KEYS=Object.keys(OV).sort((a,b)=>b.length-a.length);
 const css=`
-.zy{display:inline-flex;align-items:center;vertical-align:bottom;margin-right:.04em}
-.zy .p{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-size:.42em;line-height:1;font-weight:500;margin-left:.08em;position:relative;padding-right:.55em}
-.zy .p .b{writing-mode:vertical-rl;text-orientation:upright;letter-spacing:-.12em;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
-.zy .p .t{position:absolute;right:-.05em;bottom:.05em;font-size:1em}
-.zy .p .lt{font-size:1em;line-height:.6}
+.zy{display:inline-flex;align-items:center;white-space:nowrap;margin:0 .03em}
+.zy .h{line-height:1}
+.zy .p{display:inline-flex;align-items:flex-end;margin-left:.06em;font-size:.38em;font-weight:500;font-style:normal;line-height:1;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif}
+.zy .p .c{display:flex;flex-direction:column;align-items:center}
+.zy .p .c i{display:block;font-style:normal;height:1.02em;line-height:1.02em}
+.zy .p .c .lt{height:.6em;line-height:.6em}
+.zy .p .t{display:block;width:.55em;line-height:1;margin-bottom:.35em;margin-left:-.05em}
+.zy .p .t.n{visibility:hidden}
+body:not(.nozy) .prompt,body:not(.nozy) .hint,body:not(.nozy) .miss,body:not(.nozy) .learn p{line-height:1.9!important}
 body.nozy .zy .p{display:none}
 body{padding-top:58px!important}
 #zyBtn{position:fixed;top:10px;right:10px;z-index:50;border:2px solid rgba(0,0,0,.1);background:#fff;border-radius:999px;padding:6px 12px;font:900 14px "Noto Sans TC",sans-serif;color:#2b2340;cursor:pointer;box-shadow:0 3px 0 rgba(0,0,0,.08)}
@@ -20,8 +24,9 @@ function pin(z){
   if(!z)return '';
   let light=false;if(z.endsWith('˙')){light=true;z=z.slice(0,-1);}
   let tone='';const m=z.match(/[ˊˇˋ]$/);if(m){tone=m[0];z=z.slice(0,-1);}
-  return `<span class="p">${light?'<span class="lt">˙</span>':''}<span class="b">${z}</span>${tone?`<span class="t">${tone}</span>`:''}</span>`;
+  return `<span class="p"><span class="c">${light?'<i class="lt">˙</i>':''}${[...z].map(c=>`<i>${c}</i>`).join('')}</span><span class="t${tone?'':' n'}">${tone||'ˊ'}</span></span>`;
 }
+
 function convert(text){
   const out=[];let i=0;const sound=new Array(text.length).fill(null);
   for(let k=0;k<text.length;k++){for(const w of KEYS){if(text.startsWith(w,k)){OV[w].forEach((z,j)=>{if(z&&sound[k+j]==null)sound[k+j]=z;});}}}
@@ -37,6 +42,7 @@ function skip(el){
     const t=e.tagName;
     if(t==='SCRIPT'||t==='STYLE'||t==='TITLE'||t==='svg'||t==='SVG'||e.namespaceURI==='http://www.w3.org/2000/svg')return true;
     if(e.id==='zyBtn'||(e.classList&&e.classList.contains('zy')))return true;
+    if(e.classList&&['hud','backhome','sub','best','foot','unit','pill'].some(c=>e.classList.contains(c)))return true;
   }
   return false;
 }
