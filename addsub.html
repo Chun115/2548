@@ -61,7 +61,7 @@ window.GAME={
         const b=RI(10,Math.min(60,L.v));const a=L.v+b;if(a<200)r={t:`${a} − ${b}`,v:L.v};}}
       const ans=L.v>r.v?'>':L.v<r.v?'<':'=';const sym={'>':'＞','<':'＜','=':'＝'}[ans];
       return {prompt:`<span style="font-size:32px">${L.t} ○ ${r.t}</span>`,ans,opts:[{v:'>',t:'＞'},{v:'<',t:'＜'},{v:'=',t:'＝'}],
-        miss:`${L.t} = ${L.v}，${r.t}${r.t.match(/[+−]/)?` = ${r.v}`:''}，所以 ${L.t} ${sym} ${r.t}`};
+        miss:`${L.t} = ${L.v}${r.t.match(/[+−]/)?`，${r.t} = ${r.v}`:''}，所以 ${L.t} ${sym} ${r.t}`};
     }
     const k=R(4);
     if(k===0){const [a,b]=genAdd(true);return {prompt:`圖書角有 ${a} 本故事書，<br>又放進 ${b} 本，現在有幾本？`,ans:a+b,opts:numOpts(a+b,[a-b>0?a-b:a+b+10,a+b-10],' 本'),miss:`${a} + ${b} = <b>${a+b}</b> 本`};}
@@ -71,7 +71,7 @@ window.GAME={
   }
 };
 </script>
-<script src="engine.js?v=4"></script>
-<script src="zhuyin.js?v=4"></script>
+<script src="engine.js?v=5"></script>
+<script src="zhuyin.js?v=5"></script>
 </body>
 </html>

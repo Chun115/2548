@@ -52,9 +52,10 @@ window.GAME={
     // unit：個別單位
     const k=R(3);
     const U=[['🧷','迴紋針'],['🖍️','蠟筆'],['🧱','積木']];
+    const STICK=[['🟥','紅色小棒'],['🟦','藍色小棒']];
     if(k===0){ // 同一物體，不同單位
-      const [u1,u2]=shuffle([...U]).slice(0,2);const n1=RI(5,9),n2=RI(2,n1-2);
-      return {prompt:`同一張桌子，用${u1[1]}量是 ${n1} 個，<br>用${u2[1]}量是 ${n2} 個。<br>哪一個比較長？`,ans:u2[1],
+      const [u1,u2]=shuffle([...STICK]);const n1=RI(5,9),n2=RI(2,n1-2);
+      return {prompt:`同一張桌子，用${u1[1]}量是 ${n1} 個，<br>用${u2[1]}量是 ${n2} 個。<br>哪一種小棒比較長？`,ans:u2[1],
         opts:shuffle([{v:u1[1],t:u1[1]},{v:u2[1],t:u2[1]},{v:'一樣長',t:'一樣長'}]),
         miss:`量同一個東西，用的東西越長，量出來的數量越少，所以 <b>${u2[1]}</b> 比較長`};
     }
@@ -69,7 +70,7 @@ window.GAME={
   }
 };
 </script>
-<script src="engine.js?v=4"></script>
-<script src="zhuyin.js?v=4"></script>
+<script src="engine.js?v=5"></script>
+<script src="zhuyin.js?v=5"></script>
 </body>
 </html>

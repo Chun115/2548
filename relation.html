@@ -50,7 +50,7 @@ window.GAME={
       // 判斷答案對不對
       const bad=Math.random()<.5;const shown=bad?a+pick([10,-10,1,-1]):a;
       return {prompt:`小明算：${c} − ${b} = ${shown}<br><span style="font-size:18px">用加法驗算看看，他算對了嗎？</span>`,ans:bad?'錯':'對',
-        opts:[{v:'對',t:'⭕ 對'},{v:'錯',t:'❌ 錯'}],miss:`${shown} + ${b} = ${shown+b}${bad?` 不等於 ${c}，所以<b>算錯了</b>，正確是 ${a}`:` = ${c}，所以<b>算對了</b>`}`};
+        opts:[{v:'對',t:'⭕ 對'},{v:'錯',t:'❌ 錯'}],miss:`${shown} + ${b} = ${shown+b}${bad?`，不等於 ${c}，所以<b>算錯了</b>，正確是 ${a}`:`，等於 ${c}，所以<b>算對了</b>`}`};
     }
     const k=R(4);
     if(k===0)return {prompt:`小美有一些彈珠，哥哥又給她 ${b} 顆，<br>現在有 ${c} 顆。小美原來有幾顆？`,ans:a,opts:numOpts(a,[c+b],' 顆'),miss:`${c} − ${b} = <b>${a} 顆</b>`};
@@ -60,7 +60,7 @@ window.GAME={
   }
 };
 </script>
-<script src="engine.js?v=4"></script>
-<script src="zhuyin.js?v=4"></script>
+<script src="engine.js?v=5"></script>
+<script src="zhuyin.js?v=5"></script>
 </body>
 </html>

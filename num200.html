@@ -56,7 +56,7 @@ window.GAME={
       const h=Math.random()<.8?1:(Math.random()<.5?0:2);let t=R(10),o=R(10);
       if(h===2){t=0;o=0;}
       const n=h*100+t*10+o;
-      const wr=[h*100+o*10+t, h*100+t+o*10, t*10+o, n+10, n-10, n+1];
+      const wr=[h*100+o*10+t, t*10+o, n+10, n-10, n+1].filter(v=>v>0);
       return {prompt:'這些積木一共是多少？',visual:blocks(h,t,o),ans:n,opts:numOpts(n,wr.filter(v=>v!==n&&v>=0)),
         miss:`${h} 個百、${t} 個十、${o} 個一，是 <b>${n}</b>`};
     }
@@ -85,11 +85,11 @@ window.GAME={
     }
     if(m==='compare'){
       let a,b,ta,tb;const k=R(3);
-      if(k===0){a=RI(100,200);b=Math.random()<.4?a:(Math.random()<.5?a+pick([1,10,-1,-10]):RI(100,200));if(b>200)b=a-1;ta=a;tb=b;}
-      else if(k===1){const x=RI(1,9)*10+RI(0,9);a=100+x;b=Math.random()<.5?a:(Math.random()<.5?100+x%10*10+Math.floor(x/10):a+pick([1,-1,10,-10]));ta=`100 + ${x}`;tb=b;}
-      else{a=RI(100,199);b=RI(100,199);if(Math.random()<.3)b=a;ta=a;tb=b;
+      if(k===0){a=RI(100,200);b=Math.random()<.15?a:(Math.random()<.5?a+pick([1,10,-1,-10]):RI(100,200));if(b>200)b=a-1;ta=a;tb=b;}
+      else if(k===1){const x=RI(1,9)*10+RI(0,9);a=100+x;b=Math.random()<.3?a:(Math.random()<.5?100+x%10*10+Math.floor(x/10):a+pick([1,-1,10,-10]));ta=`100 + ${x}`;tb=b;}
+      else{a=RI(100,199);b=RI(100,199);ta=a;tb=b;
         // 十位個位對調的陷阱
-        if(Math.random()<.5){const t=Math.floor(a/10)%10,o=a%10;b=100+o*10+t;tb=b;}}
+        if(Math.random()<.5){const t=Math.floor(a/10)%10,o=a%10;if(t!==o){b=100+o*10+t;tb=b;}}}
       if(b>200){b=a-1;tb=b;}
       const ans=a>b?'>':a<b?'<':'=';
       return {prompt:`${ta} ○ ${tb}`,big:String(ta).length<5,ans,opts:[{v:'>',t:'＞'},{v:'<',t:'＜'},{v:'=',t:'＝'}],
@@ -103,7 +103,7 @@ window.GAME={
   }
 };
 </script>
-<script src="engine.js?v=4"></script>
-<script src="zhuyin.js?v=4"></script>
+<script src="engine.js?v=5"></script>
+<script src="zhuyin.js?v=5"></script>
 </body>
 </html>
