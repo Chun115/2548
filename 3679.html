@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>3679 乘法大冒險</title>
+<meta name="description" content="國小二年級 3、6、7、9 的乘法練習遊戲：慢慢練習、填空偵探、60 秒快閃、乘法表，答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="3679 乘法大冒險｜三、六、七、九的乘法練習">
+<meta property="og:description" content="國小二年級 3、6、7、9 的乘法練習遊戲：慢慢練習、填空偵探、60 秒快閃、乘法表，答對有獎勵音效，手機平板打開就能玩。">
+<meta property="og:image" content="https://chun115.github.io/2548/og-3679.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://chun115.github.io/2548/3679.html">
+<meta name="twitter:card" content="summary_large_image">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#fff7e8; --ink:#2b2340; --soft:#6b6280; --card:#ffffff;
+  --c2:#ff7a59; --c5:#2bb3a3; --c4:#5b7cfa; --c8:#f2b705;
+  --ok:#27ae60; --bad:#e74c3c; --line:#efe3cc;
+}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);
+  font-family:"Noto Sans TC",system-ui,sans-serif;display:flex;justify-content:center;padding:20px 14px 40px}
+.wrap{width:100%;max-width:560px}
+h1{font-size:30px;font-weight:900;margin:6px 0 2px;text-align:center;letter-spacing:1px}
+h1 span{display:inline-block}
+.sub{color:var(--soft);text-align:center;margin:0 0 18px;font-size:15px}
+.card{background:var(--card);border:3px solid var(--line);border-radius:22px;padding:20px;box-shadow:0 6px 0 var(--line)}
+.label{font-weight:700;margin:4px 0 10px;font-size:16px}
+.tables{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:18px}
+.tbtn{border:3px solid transparent;border-radius:18px;padding:14px 0;font:900 30px "Noto Sans TC";color:#fff;cursor:pointer;opacity:.35;transition:.15s;box-shadow:0 4px 0 rgba(0,0,0,.15)}
+.tbtn.on{opacity:1;transform:translateY(-2px)}
+.tbtn small{display:block;font-size:12px;font-weight:700}
+.modes{display:grid;gap:10px}
+.mode{display:flex;align-items:center;gap:12px;text-align:left;border:3px solid var(--line);background:#fffdf8;border-radius:18px;padding:12px 14px;cursor:pointer;font:inherit;color:inherit;transition:.15s}
+.mode:hover{border-color:var(--c4);transform:translateY(-1px)}
+.mode .ic{font-size:30px}
+.mode b{display:block;font-size:17px}
+.mode span{color:var(--soft);font-size:13px}
+.hud{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-weight:700;font-size:15px}
+.pill{background:#fff;border:2px solid var(--line);border-radius:999px;padding:5px 12px}
+.bar{height:12px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--c2),var(--c8));transition:width .3s linear}
+.q{text-align:center;font-size:56px;font-weight:900;margin:18px 0 6px;letter-spacing:2px;min-height:80px}
+.q .box{display:inline-block;min-width:64px;border:4px dashed var(--c4);border-radius:14px;color:var(--c4);padding:0 8px}
+.hint{text-align:center;color:var(--soft);min-height:22px;font-size:14px;margin-bottom:12px}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.opt{border:none;border-radius:18px;padding:18px 0;font:900 32px "Noto Sans TC";background:#f3efff;color:var(--ink);cursor:pointer;box-shadow:0 5px 0 #ddd3f7;transition:.1s}
+.opt:active{transform:translateY(3px);box-shadow:0 2px 0 #ddd3f7}
+.opt.right{background:var(--ok);color:#fff;box-shadow:0 5px 0 #1e8449}
+.opt.wrong{background:var(--bad);color:#fff;box-shadow:0 5px 0 #a93226;animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pop{animation:pop .35s}
+@keyframes pop{50%{transform:scale(1.15)}}
+.btn{display:block;width:100%;border:none;border-radius:16px;padding:14px;font:900 18px "Noto Sans TC";background:var(--c4);color:#fff;cursor:pointer;box-shadow:0 5px 0 #3d5bd6;margin-top:14px}
+.btn.ghost{background:#fff;color:var(--ink);border:3px solid var(--line);box-shadow:0 5px 0 var(--line)}
+.big{font-size:64px;text-align:center;margin:4px 0}
+.score{text-align:center;font-size:22px;font-weight:900}
+.stars{text-align:center;font-size:40px;letter-spacing:6px;margin:8px 0}
+.miss{margin-top:14px;background:#fff6f4;border-radius:14px;padding:12px 14px;font-size:16px}
+.miss div{padding:3px 0}
+.chart{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;font-size:15px}
+.chart div{background:#fffdf8;border:2px solid var(--line);border-radius:12px;padding:8px;line-height:1.7;text-align:center}
+.chart h3{margin:0 0 4px;font-size:22px}
+.best{text-align:center;color:var(--soft);font-size:14px;margin-top:10px}
+.hidden{display:none}
+.voice{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 18px;padding:10px 14px;border:3px solid var(--line);border-radius:16px;background:#fffdf8;font-weight:700}
+.toggle{border:none;border-radius:999px;padding:8px 16px;font:900 15px "Noto Sans TC";cursor:pointer;background:var(--line);color:var(--soft)}
+.toggle.on{background:var(--c5);color:#fff}
+.say{display:block;margin:0 auto 10px;border:none;border-radius:999px;padding:6px 16px;font:700 15px "Noto Sans TC";background:#e8fbf8;color:#13806f;cursor:pointer}
+.say.hidden{display:none}
+.fx{position:fixed;pointer-events:none;font-size:28px;animation:fly 1s forwards}
+@keyframes fly{to{transform:translateY(-120px) scale(1.4);opacity:0}}
+@media(max-width:420px){.q{font-size:44px}.tbtn{font-size:26px}.chart{grid-template-columns:1fr 1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1><span style="color:var(--c2)">3</span><span style="color:var(--c5)">6</span><span style="color:var(--c4)">7</span><span style="color:var(--c8)">9</span> 乘法大冒險</h1>
+  <p class="sub">三、六、七、九的乘法，一起來挑戰！</p>
+
+  <!-- 首頁 -->
+  <div id="home" class="card">
+    <div class="label">① 選擇要練習的乘法（可以多選）</div>
+    <div class="tables" id="tables"></div>
+    <div class="label">② 選擇遊戲</div>
+    <div class="modes">
+      <button class="mode" data-mode="practice"><span class="ic">🐢</span><div><b>慢慢練習</b><span>10 題，答錯會告訴你正確答案</span></div></button>
+      <button class="mode" data-mode="box"><span class="ic">🔍</span><div><b>填空偵探</b><span>□ × 4 = 20，找出藏起來的數字</span></div></button>
+      <button class="mode" data-mode="speed"><span class="ic">⚡</span><div><b>60 秒快閃</b><span>一分鐘內能答對幾題？</span></div></button>
+      <button class="mode" data-mode="chart"><span class="ic">📖</span><div><b>看乘法表</b><span>先複習再挑戰</span></div></button>
+    </div>
+    <div class="best" id="best"></div>
+  </div>
+
+  <!-- 遊戲 -->
+  <div id="game" class="card hidden">
+    <div class="hud">
+      <span class="pill" id="hudL">第 1 題</span>
+      <span class="pill" id="hudM">🔥 0</span>
+      <span class="pill" id="hudR">⭐ 0</span>
+    </div>
+    <div class="bar"><i id="bar"></i></div>
+    <div class="q" id="q"></div>
+    <div class="hint" id="hint"></div>
+    <div class="opts" id="opts"></div>
+    <button class="btn ghost" id="quit">回首頁</button>
+  </div>
+
+  <!-- 結果 -->
+  <div id="result" class="card hidden">
+    <div class="big" id="rIcon">🎉</div>
+    <div class="score" id="rScore"></div>
+    <div class="stars" id="rStars"></div>
+    <div class="miss hidden" id="rMiss"></div>
+    <button class="btn" id="again">再玩一次</button>
+    <button class="btn ghost" id="home2">回首頁</button>
+  </div>
+
+  <!-- 乘法表 -->
+  <div id="chartView" class="card hidden">
+    <div class="chart" id="chart"></div>
+    <button class="btn ghost" id="home3">回首頁</button>
+  </div>
+</div>
+
+<script>
+const COLORS={3:'var(--c2)',6:'var(--c5)',7:'var(--c4)',9:'var(--c8)'};
+let picked=new Set([3,6,7,9]);
+let mode, qi, score, streak, total, timeLeft, timer, cur, locked, misses;
+
+const $=id=>document.getElementById(id);
+function show(id){['home','game','result','chartView'].forEach(x=>$(x).classList.toggle('hidden',x!==id));}
+
+// 選乘法
+[3,6,7,9].forEach(n=>{
+  const b=document.createElement('button');
+  b.className='tbtn on';b.style.background=COLORS[n];
+  b.innerHTML=n+'<small>的乘法</small>';
+  b.onclick=()=>{
+    if(picked.has(n)){ if(picked.size>1) picked.delete(n); }
+    else picked.add(n);
+    b.classList.toggle('on',picked.has(n));
+  };
+  $('tables').appendChild(b);
+});
+
+// 音效
+let ac;
+function sfx(type){
+  try{
+    ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+    if(ac.state==='suspended')ac.resume();
+    const t0=ac.currentTime;
+    const note=(f,t,d,wave,vol)=>{const o=ac.createOscillator(),g=ac.createGain();o.type=wave||'triangle';
+      o.frequency.setValueAtTime(f,t0+t);g.gain.setValueAtTime(.0001,t0+t);
+      g.gain.exponentialRampToValueAtTime(vol||.2,t0+t+.02);g.gain.exponentialRampToValueAtTime(.0001,t0+t+d);
+      o.connect(g);g.connect(ac.destination);o.start(t0+t);o.stop(t0+t+d+.03);};
+    if(type==='ok'){ // 叮咚叮～ 上升音階 + 亮晶晶
+      [523,659,784,1047].forEach((f,i)=>note(f,i*.07,.28));
+      note(2093,.30,.35,'sine',.07);note(2637,.38,.35,'sine',.05);
+    }else if(type==='combo'){ // 連對 5 題的小號角
+      [[523,0,.12],[523,.12,.12],[523,.24,.12],[659,.36,.18],[784,.56,.14],[659,.70,.12],[1047,.84,.5]].forEach(n=>note(n[0],n[1],n[2],'square',.09));
+      [1568,2093,2637,3136].forEach((f,i)=>note(f,.9+i*.06,.3,'sine',.05));
+    }else if(type==='bad'){ // 嗚嗚～ 答錯
+      const o=ac.createOscillator(),g=ac.createGain();o.type='sawtooth';
+      o.frequency.setValueAtTime(330,t0);o.frequency.linearRampToValueAtTime(260,t0+.25);
+      o.frequency.setValueAtTime(260,t0+.3);o.frequency.linearRampToValueAtTime(170,t0+.7);
+      g.gain.setValueAtTime(.0001,t0);g.gain.exponentialRampToValueAtTime(.13,t0+.03);
+      g.gain.setValueAtTime(.13,t0+.22);g.gain.exponentialRampToValueAtTime(.02,t0+.28);
+      g.gain.exponentialRampToValueAtTime(.13,t0+.33);g.gain.exponentialRampToValueAtTime(.0001,t0+.75);
+      o.connect(g);g.connect(ac.destination);o.start(t0);o.stop(t0+.8);
+    }else if(type==='win'){ // 過關歡呼
+      [[523,0],[659,.1],[784,.2],[1047,.3],[784,.45],[1047,.55]].forEach(n=>note(n[0],n[1],.22,'square',.08));
+      [1047,1319,1568].forEach(f=>note(f,.7,.8,'triangle',.1));
+    }else if(type==='end'){
+      [392,523,659].forEach((f,i)=>note(f,i*.12,.35,'triangle',.15));
+    }
+  }catch(e){}
+}
+function beep(ok){sfx(ok?((streak+1)%5===0?'combo':'ok'):'bad');}
+
+const synth=null;const voiceOn=false;let zhVoice=null;function speak(){}
+
+function best(){try{return +localStorage.getItem('3679best')||0}catch(e){return 0}}
+function setBest(v){try{localStorage.setItem('3679best',v)}catch(e){}}
+function showBest(){const b=best();$('best').textContent=b?`⚡ 60 秒快閃最高紀錄：${b} 題`:'';}
+showBest();
+
+document.querySelectorAll('.mode').forEach(m=>m.onclick=()=>start(m.dataset.mode));
+$('quit').onclick=()=>{clearInterval(timer);synth&&synth.cancel();show('home');showBest();};
+$('home2').onclick=$('home3').onclick=()=>{show('home');showBest();};
+$('again').onclick=()=>start(mode);
+
+function start(m){
+  mode=m;
+  if(m==='chart'){drawChart();show('chartView');return;}
+  qi=0;score=0;streak=0;misses=[];total=10;
+  show('game');
+  if(m==='speed'){
+    timeLeft=60;updateBar();
+    clearInterval(timer);
+    timer=setInterval(()=>{timeLeft--;updateBar();if(timeLeft<=0){clearInterval(timer);finish();}},1000);
+  }
+  next();
+}
+
+function updateBar(){
+  if(mode==='speed'){$('bar').style.width=(timeLeft/60*100)+'%';$('hudL').textContent='⏰ '+timeLeft+' 秒';}
+  else{$('bar').style.width=(qi/total*100)+'%';$('hudL').textContent=`第 ${Math.min(qi+1,total)} / ${total} 題`;}
+  $('hudM').textContent='🔥 連對 '+streak;
+  $('hudR').textContent='⭐ '+score;
+}
+
+let last='';
+function makeQ(){
+  const arr=[...picked];let a,b,key;
+  do{a=arr[Math.floor(Math.random()*arr.length)];b=1+Math.floor(Math.random()*9);key=a+'x'+b;}while(key===last&&arr.length*9>1);
+  last=key;
+  const ans=a*b;
+  if(mode==='box'){
+    // 隨機藏左邊的 b（□ × a 或 a × □）
+    const left=Math.random()<.5;
+    return {a,b,ans:b,text:left?`<span class="box">?</span> × ${a} = ${ans}`:`${a} × <span class="box">?</span> = ${ans}`,full:left?`${b} × ${a} = ${ans}`:`${a} × ${b} = ${ans}`,
+      say:left?`幾乘以${a}，等於${ans}？`:`${a}乘以幾，等於${ans}？`,
+      sayFull:left?`${b}乘以${a}，等於${ans}`:`${a}乘以${b}，等於${ans}`,pool:'small'};
+  }
+  return {a,b,ans,text:`${a} × ${b} = <span class="box">?</span>`,full:`${a} × ${b} = ${ans}`,
+    say:`${a}乘以${b}，等於多少？`,sayFull:`${a}乘以${b}，等於${ans}`,pool:'prod'};
+}
+
+function choices(c){
+  const s=new Set([c.ans]);
+  if(c.pool==='small'){
+    while(s.size<4){const v=1+Math.floor(Math.random()*9);s.add(v);}
+  }else{
+    const near=[c.a*(c.b+1),c.a*(c.b-1),c.ans+1,c.ans-1,c.ans+2,({3:6,6:9,7:6,9:6}[c.a]||c.a)*c.b];
+    near.sort(()=>Math.random()-.5);
+    for(const v of near){if(v>0&&v!==c.ans)s.add(v);if(s.size>=4)break;}
+    while(s.size<4)s.add(1+Math.floor(Math.random()*81));
+  }
+  return [...s].sort(()=>Math.random()-.5);
+}
+
+function next(){
+  locked=false;cur=makeQ();updateBar();
+  $('q').innerHTML=cur.text;$('q').classList.remove('pop');
+  $('hint').textContent='';
+  const o=$('opts');o.innerHTML='';
+  choices(cur).forEach(v=>{
+    const b=document.createElement('button');b.className='opt';b.textContent=v;
+    b.onclick=()=>answer(b,v);o.appendChild(b);
+  });
+  speak(cur.say);
+}
+
+function answer(btn,v){
+  if(locked)return;locked=true;
+  const ok=v===cur.ans;beep(ok);
+  $('q').innerHTML=cur.full;
+  if(ok){
+    btn.classList.add('right');score++;streak++;
+    $('q').classList.add('pop');
+    $('hint').textContent=streak>=5?'太厲害了！連對 '+streak+' 題 🔥':['答對了！','好棒！','厲害！','正確！'][Math.floor(Math.random()*4)];
+    burst(btn);
+    if(mode==='speed')synth&&synth.cancel();else speak('答對了！'+cur.sayFull);
+  }else{
+    speak('正確答案是，'+cur.sayFull);
+    btn.classList.add('wrong');streak=0;
+    [...$('opts').children].forEach(b=>{if(+b.textContent===cur.ans)b.classList.add('right');});
+    $('hint').textContent='沒關係，正確答案是 '+cur.ans+'，記起來喔！';
+    misses.push(cur.full);
+  }
+  qi++;updateBar();
+  const wait=ok?(mode==='speed'?350:(voiceOn?1900:700)):(mode==='speed'?(voiceOn?1800:900):(voiceOn?2600:1600));
+  setTimeout(()=>{
+    if(mode==='speed'&&timeLeft<=0)return;
+    if(mode!=='speed'&&qi>=total)finish();else next();
+  },wait);
+}
+
+function burst(el){
+  const r=el.getBoundingClientRect();
+  for(let i=0;i<3;i++){
+    const s=document.createElement('div');s.className='fx';s.textContent=['⭐','✨','🌟'][i];
+    s.style.left=(r.left+r.width/2-14+(i-1)*30)+'px';s.style.top=(r.top)+'px';
+    document.body.appendChild(s);setTimeout(()=>s.remove(),1000);
+  }
+}
+
+function finish(){
+  clearInterval(timer);show('result');
+  let stars,icon,text;
+  if(mode==='speed'){
+    const b=best();const nb=score>b;if(nb)setBest(score);
+    text=`60 秒內答對 ${score} 題！`+(nb?'<br>🏆 新紀錄！':`<br><small>最高紀錄 ${Math.max(b,score)} 題</small>`);
+    stars=score>=25?3:score>=15?2:score>=8?1:0;
+  }else{
+    text=`10 題答對 ${score} 題`;
+    stars=score===10?3:score>=8?2:score>=5?1:0;
+  }
+  icon=['💪','👍','🎉','🏆'][stars];
+  speak(mode==='speed'?`時間到！你答對了${score}題`:`你答對了${score}題，`+['再加油喔','不錯喔','好棒','滿分，太厲害了'][stars],1);
+  $('rIcon').textContent=icon;
+  $('rScore').innerHTML=text;
+  sfx(stars>=2?'win':'end');
+  $('rStars').textContent='⭐'.repeat(stars)+'☆'.repeat(3-stars);
+  const m=$('rMiss');
+  if(misses.length){
+    const uniq=[...new Set(misses)];
+    m.innerHTML='<b>📝 再記一次：</b>'+uniq.map(x=>`<div>${x}</div>`).join('');
+    m.classList.remove('hidden');
+  }else m.classList.add('hidden');
+}
+
+function drawChart(){
+  $('chart').innerHTML=[3,6,7,9].map(n=>`<div><h3 style="color:${COLORS[n]}">${n} 的乘法</h3>`+
+    Array.from({length:9},(_,i)=>`${n} × ${i+1} = <b>${n*(i+1)}</b>`).join('<br>')+'</div>').join('');
+}
+</script>
+</body>
+</html>
